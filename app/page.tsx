@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
+import { Button } from "@/components/ui/button"
 
 type Post = {
   id: number
@@ -52,9 +53,7 @@ export default function TestPage() {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
-          Publicar
-        </button>
+        <Button type="submit">Crear post</Button>
       </form>
 
       {/* Lista de posts */}
