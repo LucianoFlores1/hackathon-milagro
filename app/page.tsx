@@ -4,6 +4,10 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select"
 
 type Post = {
   id: string
@@ -57,40 +61,54 @@ export default function TestPage() {
     <div className="p-6 space-y-6">
       {/* Formulario */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          className="border p-2 w-full"
-          placeholder="Título"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <textarea
-          className="border p-2 w-full"
-          placeholder="Descripción"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <select
-          className="border p-2 w-full"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="lost">Perdido</option>
-          <option value="found">Encontrado</option>
-        </select>
-        <select
-          className="border p-2 w-full"
-          value={species}
-          onChange={(e) => setSpecies(e.target.value)}
-        >
-          <option value="dog">Perro</option>
-          <option value="cat">Gato</option>
-          <option value="other">Otro</option>
-        </select>
+        <div className="space-y-2">
+          <Label htmlFor="title">Título</Label>
+          <Input
+            id="title"
+            placeholder="Título"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="description">Descripción</Label>
+          <Textarea
+            id="description"
+            placeholder="Descripción"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="status">Estado</Label>
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger id="status">
+              <SelectValue placeholder="Selecciona el estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="lost">Perdido</SelectItem>
+              <SelectItem value="found">Encontrado</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="species">Especie</label>
+          <Select value={species} onValueChange={setSpecies}>
+            <SelectTrigger id="species">
+              <SelectValue placeholder="Selecciona la especie" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="dog">Perro</SelectItem>
+              <SelectItem value="cat">Gato</SelectItem>
+              <SelectItem value="other">Otro</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <Button type="submit">Crear post</Button>
       </form>
 
       {/* Lista de posts con tarjeta esta vez*/}
-      <div className="space-y-4">
+      <div className="space-y-4 mt-8">
         {posts.map((post) => (
           <Card key={post.id} className="shadow-md">
             <CardHeader>
