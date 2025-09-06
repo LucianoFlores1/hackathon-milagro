@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 
 type Post = {
-  id: number
+  id: string
   title: string
   description: string
   status: string
