@@ -7,7 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type Post = {
   id: string
@@ -17,14 +23,13 @@ type Post = {
   species: string
 }
 
-export default function TestPage() {
+export default function Home() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [status, setStatus] = useState("lost") // Nuevo estado
-  const [species, setSpecies] = useState("dog") // Nuevo estado
+  const [status, setStatus] = useState("lost")
+  const [species, setSpecies] = useState("dog")
   const [posts, setPosts] = useState<Post[]>([])
 
-  // Traer posts al cargar la página
   useEffect(() => {
     const fetchPosts = async () => {
       const { data, error } = await supabase.from("posts").select("*").order("id", { ascending: false })
@@ -33,7 +38,6 @@ export default function TestPage() {
     fetchPosts()
   }, [])
 
-  // Insertar post
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const { error } = await supabase.from("posts").insert({
@@ -50,8 +54,6 @@ export default function TestPage() {
       setDescription("")
       setStatus("lost")
       setSpecies("dog")
-      // Después de insertar, volver a traer los posts para
-      // refrescar la lista sin recargar la página
       const { data } = await supabase.from("posts").select("*").order("id", { ascending: false })
       if (data) setPosts(data as Post[])
     }
@@ -70,6 +72,7 @@ export default function TestPage() {
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
+
         <div className="space-y-2">
           <Label htmlFor="description">Descripción</Label>
           <Textarea
@@ -79,6 +82,7 @@ export default function TestPage() {
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
+
         <div className="space-y-2">
           <Label htmlFor="status">Estado</Label>
           <Select value={status} onValueChange={setStatus}>
@@ -91,8 +95,9 @@ export default function TestPage() {
             </SelectContent>
           </Select>
         </div>
+
         <div className="space-y-2">
-          <label htmlFor="species">Especie</label>
+          <Label htmlFor="species">Especie</Label>
           <Select value={species} onValueChange={setSpecies}>
             <SelectTrigger id="species">
               <SelectValue placeholder="Selecciona la especie" />
@@ -104,6 +109,7 @@ export default function TestPage() {
             </SelectContent>
           </Select>
         </div>
+
         <Button type="submit">Crear post</Button>
       </form>
 
