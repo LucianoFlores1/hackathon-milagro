@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type Post = {
   id: string
@@ -43,6 +44,9 @@ export default function TestPage() {
     if (!error) {
       setTitle("")
       setDescription("")
+      setStatus("lost")
+      setSpecies("dog")
+      // Después de insertar, volver a traer los posts para
       // refrescar la lista sin recargar la página
       const { data } = await supabase.from("posts").select("*").order("id", { ascending: false })
       if (data) setPosts(data as Post[])
@@ -85,15 +89,19 @@ export default function TestPage() {
         <Button type="submit">Crear post</Button>
       </form>
 
-      {/* Lista de posts */}
+      {/* Lista de posts con tarjeta esta vez*/}
       <div className="space-y-4">
         {posts.map((post) => (
-          <div key={post.id} className="border p-4 rounded">
-            <h3 className="font-bold">{post.title}</h3>
-            <p>{post.description}</p>
-            <p>Status: {post.status}</p>
-            <p>Especie: {post.species}</p>
-          </div>
+          <Card key={post.id} className="shadow-md">
+            <CardHeader>
+              <CardTitle>{post.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p>{post.description}</p>
+              <p className="text-sm text-gray-600">Estado: {post.status}</p>
+              <p className="text-sm text-gray-600">Especie: {post.species}</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
