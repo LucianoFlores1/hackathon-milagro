@@ -32,7 +32,10 @@ export default function Home() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data, error } = await supabase.from("posts").select("*").order("id", { ascending: false })
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .order("created_at", { ascending: false })
       if (!error && data) setPosts(data as Post[])
     }
     fetchPosts()
