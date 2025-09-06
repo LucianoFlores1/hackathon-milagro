@@ -27,13 +27,21 @@ export default function TestPage() {
   // Insertar post
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const { error } = await supabase.from("posts").insert([{ title, description }])
+    const { error } = await supabase.from("posts").insert({
+      status: "lost",
+      species: "dog",
+      title,
+      description,
+      zone_text: "Zona de prueba",
+      contact_type: "whatsapp",
+      contact_value: "https://wa.me/549381000000"
+    })
     if (!error) {
       setTitle("")
       setDescription("")
       // refrescar la lista sin recargar la página
       const { data } = await supabase.from("posts").select("*").order("id", { ascending: false })
-      if (data) setPosts(data)
+      if (data) setPosts(data as Post[])
     }
   }
 
