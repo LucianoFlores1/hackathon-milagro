@@ -8,18 +8,22 @@ type Post = {
   id: number
   title: string
   description: string
+  status: string
+  species: string
 }
 
 export default function TestPage() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
+  const [status, setStatus] = useState("lost") // Nuevo estado
+  const [species, setSpecies] = useState("dog") // Nuevo estado
   const [posts, setPosts] = useState<Post[]>([])
 
   // Traer posts al cargar la página
   useEffect(() => {
     const fetchPosts = async () => {
       const { data, error } = await supabase.from("posts").select("*").order("id", { ascending: false })
-      if (!error && data) setPosts(data)
+      if (!error && data) setPosts(data as Post[])
     }
     fetchPosts()
   }, [])
@@ -28,10 +32,10 @@ export default function TestPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const { error } = await supabase.from("posts").insert({
-      status: "lost",
-      species: "dog",
       title,
       description,
+      status,
+      species,
       zone_text: "Zona de prueba",
       contact_type: "whatsapp",
       contact_value: "https://wa.me/549381000000"
@@ -61,6 +65,23 @@ export default function TestPage() {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+        <select
+          className="border p-2 w-full"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          <option value="lost">Perdido</option>
+          <option value="found">Encontrado</option>
+        </select>
+        <select
+          className="border p-2 w-full"
+          value={species}
+          onChange={(e) => setSpecies(e.target.value)}
+        >
+          <option value="dog">Perro</option>
+          <option value="cat">Gato</option>
+          <option value="other">Otro</option>
+        </select>
         <Button type="submit">Crear post</Button>
       </form>
 
@@ -70,6 +91,8 @@ export default function TestPage() {
           <div key={post.id} className="border p-4 rounded">
             <h3 className="font-bold">{post.title}</h3>
             <p>{post.description}</p>
+            <p>Status: {post.status}</p>
+            <p>Especie: {post.species}</p>
           </div>
         ))}
       </div>
