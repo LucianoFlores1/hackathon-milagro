@@ -3,10 +3,16 @@
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 
+type Post = {
+  id: number
+  title: string
+  description: string
+}
+
 export default function TestPage() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [posts, setPosts] = useState<any[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
 
   // Traer posts al cargar la página
   useEffect(() => {
