@@ -40,6 +40,17 @@ export default function Home() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const [filterStatus, setFilterStatus] = useState<string>("all")
+  const [filterSpecies, setFilterSpecies] = useState<string>("all")
+
+  // posts filtrados en memoria
+  const filteredPosts = posts.filter((post) => {
+    const matchStatus =
+      filterStatus === "all" ? true : post.status === filterStatus
+    const matchSpecies =
+      filterSpecies === "all" ? true : post.species === filterSpecies
+    return matchStatus && matchSpecies
+  })
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -190,9 +201,42 @@ export default function Home() {
         </p>
       )}
 
+      {/* Filtros */}
+      <div className="flex gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="filter-status">Filtrar por estado</Label>
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger id="filter-status">
+              <SelectValue placeholder="Todos" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="lost">Perdido</SelectItem>
+              <SelectItem value="found">Encontrado</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="filter-species">Filtrar por especie</Label>
+          <Select value={filterSpecies} onValueChange={setFilterSpecies}>
+            <SelectTrigger id="filter-species">
+              <SelectValue placeholder="Todas" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas</SelectItem>
+              <SelectItem value="dog">Perro</SelectItem>
+              <SelectItem value="cat">Gato</SelectItem>
+              <SelectItem value="other">Otro</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+
       {/* Lista de posts */}
       <div className="space-y-4 mt-8">
-        {posts.map((post) => (
+        {filteredPosts.map((post) => (
           <Card key={post.id} className="shadow-md">
             <CardHeader>
               <CardTitle>{post.title}</CardTitle>
