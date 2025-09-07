@@ -14,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail } from "lucide-react"
 
 type Post = {
   id: string
@@ -239,25 +241,49 @@ export default function Home() {
         {filteredPosts.map((post) => (
           <Card key={post.id} className="shadow-md">
             <CardHeader>
-              <CardTitle>{post.title}</CardTitle>
+              <CardTitle className="flex items-center justify-between">
+                {post.title}
+                <Badge
+                  variant="outline"
+                  className={`
+                    ${post.status === "lost" ? "bg-red-500 text-white" : "bg-green-500 text-white"}
+                  `}
+                >
+                  {post.status === "lost" ? "Perdido" : "Encontrado"}
+                </Badge>
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <p>{post.description}</p>
-              <p className="text-sm text-gray-600">Estado: {post.status}</p>
-              <p className="text-sm text-gray-600">Especie: {post.species}</p>
-              {post.zone_text && (
-                <p className="text-sm text-gray-600">Zona: {post.zone_text}</p>
-              )}
-              {post.event_date && (
-                <p className="text-sm text-gray-600">
-                  Fecha del hecho:{" "}
-                  {new Date(post.event_date).toLocaleDateString()}
-                </p>
-              )}
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                {post.species === "dog" && <Dog size={16} />}
+                <span>Especie:{post.species} </span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <MapPin size={16} />
+                <span>Zona: {post.zone_text}</span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <Calendar size={16} />
+                <span>Fecha del avistamiento: {new Date(post.event_date).toLocaleDateString()}</span>
+              </div>
+
               {(post.contact_type || post.contact_value) && (
-                <p className="text-sm text-gray-600">
-                  Contacto: {post.contact_type}: {post.contact_value}
-                </p>
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  {post.contact_type === "whatsapp" ? <MessageCircle size={16} /> : <Mail size={16} />}
+                  <span>
+                    Contacto:
+                    {post.contact_type === "whatsapp" ? (
+                      <a href={`https://wa.me/${post.contact_value}`} target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 underline">
+                        {post.contact_value}
+                      </a>
+                    ) : (
+                      <a href={`mailto:${post.contact_value}`} className="ml-1 text-blue-500 underline">
+                        {post.contact_value}
+                      </a>
+                    )}
+                  </span>
+                </div>
               )}
             </CardContent>
           </Card>
