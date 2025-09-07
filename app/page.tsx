@@ -38,6 +38,8 @@ export default function Home() {
   const [contactType, setContactType] = useState("whatsapp")
   const [contactValue, setContactValue] = useState("")
   const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -52,6 +54,24 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // 🔎 Validaciones simples
+    if (!title.trim() || !description.trim()) {
+      setMessage("El título y la descripción son obligatorios.")
+      return
+    }
+    if (!contactValue.trim()) {
+      setMessage("Debes ingresar un valor de contacto.")
+      return
+    }
+    if (eventDate && new Date(eventDate) > new Date()) {
+      setMessage("La fecha no puede ser futura.")
+      return
+    }
+
+    setLoading(true)
+    setMessage(null)
+
     const { error } = await supabase.from("posts").insert({
       title,
       description,
@@ -62,7 +82,10 @@ export default function Home() {
       contact_type: contactType, // Agregado
       contact_value: contactValue // Agregado
     })
-    if (!error) {
+    if (error) {
+      setMessage("❌ Error al crear el post. Intenta de nuevo.")
+    } else {
+      setMessage("✅ Post creado exitosamente.")
       setTitle("")
       setDescription("")
       setStatus("lost")
@@ -74,6 +97,8 @@ export default function Home() {
       const { data } = await supabase.from("posts").select("*").order("id", { ascending: false })
       if (data) setPosts(data as Post[])
     }
+
+    setLoading(false)
   }
 
   return (
@@ -151,10 +176,21 @@ export default function Home() {
           <Label htmlFor="contact-value">Valor de contacto</Label>
           <Input id="contact-value" placeholder="Ej: 3811234567 o email@ejemplo.com" value={contactValue} onChange={(e) => setContactValue(e.target.value)} />
         </div>
-        <Button type="submit">Crear post</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? "Creando..." : "Crear Post"}
+        </Button>
       </form>
 
-      {/* Lista de posts con tarjeta esta vez*/}
+      {/* Mensajes de feedback */}
+      {message && (
+        <p
+          className={`text-sm ${message.startsWith("✅") ? "text-green-600" : "text-red-600"
+            }`}
+        >{message}
+        </p>
+      )}
+
+      {/* Lista de posts */}
       <div className="space-y-4 mt-8">
         {posts.map((post) => (
           <Card key={post.id} className="shadow-md">
@@ -165,6 +201,20 @@ export default function Home() {
               <p>{post.description}</p>
               <p className="text-sm text-gray-600">Estado: {post.status}</p>
               <p className="text-sm text-gray-600">Especie: {post.species}</p>
+              {post.zone_text && (
+                <p className="text-sm text-gray-600">Zona: {post.zone_text}</p>
+              )}
+              {post.event_date && (
+                <p className="text-sm text-gray-600">
+                  Fecha del hecho:{" "}
+                  {new Date(post.event_date).toLocaleDateString()}
+                </p>
+              )}
+              {(post.contact_type || post.contact_value) && (
+                <p className="text-sm text-gray-600">
+                  Contacto: {post.contact_type}: {post.contact_value}
+                </p>
+              )}
             </CardContent>
           </Card>
         ))}
