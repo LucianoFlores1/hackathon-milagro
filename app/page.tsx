@@ -21,6 +21,11 @@ type Post = {
   description: string
   status: string
   species: string
+  zone_text: string
+  event_date: string
+  contact_type: string
+  contact_value: string
+  created_at: string
 }
 
 export default function Home() {
@@ -28,6 +33,10 @@ export default function Home() {
   const [description, setDescription] = useState("")
   const [status, setStatus] = useState("lost")
   const [species, setSpecies] = useState("dog")
+  const [zoneText, setZoneText] = useState("")
+  const [eventDate, setEventDate] = useState("")
+  const [contactType, setContactType] = useState("whatsapp")
+  const [contactValue, setContactValue] = useState("")
   const [posts, setPosts] = useState<Post[]>([])
 
   useEffect(() => {
@@ -48,15 +57,20 @@ export default function Home() {
       description,
       status,
       species,
-      zone_text: "Zona de prueba",
-      contact_type: "whatsapp",
-      contact_value: "https://wa.me/549381000000"
+      zone_text: zoneText, // Agregado
+      event_date: eventDate, // Agregado
+      contact_type: contactType, // Agregado
+      contact_value: contactValue // Agregado
     })
     if (!error) {
       setTitle("")
       setDescription("")
       setStatus("lost")
       setSpecies("dog")
+      setZoneText("") // Agregado
+      setEventDate("") // Agregado
+      setContactType("whatsapp") // Agregado
+      setContactValue("") // Agregado
       const { data } = await supabase.from("posts").select("*").order("id", { ascending: false })
       if (data) setPosts(data as Post[])
     }
@@ -112,7 +126,31 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
-
+        <div className="space-y-2">
+          <Label htmlFor="zone">Zona aproximada</Label>
+          <Input id="zone" placeholder="Ej: Cerrillos" value={zoneText} onChange={(e) => setZoneText(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="event-date">Fecha del hecho</Label>
+          <Input id="event-date" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="contact-type">Tipo de contacto</Label>
+          <Select value={contactType} onValueChange={setContactType}>
+            <SelectTrigger id="contact-type">
+              <SelectValue placeholder="Selecciona el tipo de contacto" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="whatsapp">WhatsApp</SelectItem>
+              <SelectItem value="email">Email</SelectItem>
+              <SelectItem value="form">Formulario</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="contact-value">Valor de contacto</Label>
+          <Input id="contact-value" placeholder="Ej: 3811234567 o email@ejemplo.com" value={contactValue} onChange={(e) => setContactValue(e.target.value)} />
+        </div>
         <Button type="submit">Crear post</Button>
       </form>
 
