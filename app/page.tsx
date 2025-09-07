@@ -44,6 +44,7 @@ export default function Home() {
   const [message, setMessage] = useState<string | null>(null)
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [filterSpecies, setFilterSpecies] = useState<string>("all")
+  const [searchTerm, setSearchTerm] = useState<string>("")
 
   // posts filtrados en memoria
   const filteredPosts = posts.filter((post) => {
@@ -56,14 +57,28 @@ export default function Home() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .order("created_at", { ascending: false })
+      let query = supabase.from("posts").select("*")
+
+      // Aplica el filtro de estado si está activo
+      if (filterStatus && filterStatus !== "all") {
+        query = query.eq("status", filterStatus)
+      }
+
+      // Aplica el filtro de especie si está activo
+      if (filterSpecies && filterSpecies !== "all") {
+        query = query.eq("species", filterSpecies)
+      }
+
+      // 🔍 Agrega el filtro de búsqueda de texto
+      if (searchTerm) {
+        query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false })
       if (!error && data) setPosts(data as Post[])
     }
     fetchPosts()
-  }, [])
+  }, [filterStatus, filterSpecies, searchTerm])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,11 +89,11 @@ export default function Home() {
       return
     }
     if (!contactValue.trim()) {
-      setMessage("Debes ingresar un valor de contacto.")
+      setMessage("❌ Debes ingresar un valor de contacto.")
       return
     }
     if (eventDate && new Date(eventDate) > new Date()) {
-      setMessage("La fecha no puede ser futura.")
+      setMessage("❌ La fecha no puede ser futura.")
       return
     }
 
@@ -116,6 +131,15 @@ export default function Home() {
 
   return (
     <div className="p-6 space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="search">Buscar</Label>
+        <Input
+          id="search"
+          placeholder="Buscar por título o descripción..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
       {/* Formulario */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
