@@ -364,8 +364,8 @@ export default function Home() {
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
         {posts.map((post) => (
-          <Link href={`/posts/${post.id}`}>
-            <Card key={post.id} className="shadow-md flex flex-col justify-between">
+          <Link key={post.id} href={`/posts/${post.id}`}>
+            <Card className="shadow-md flex flex-col justify-between hover:shadow-lg cursor-pointer transition-shadow">
               <div>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
@@ -413,13 +413,25 @@ export default function Home() {
                     <span>
                       Contacto:
                       {post.contact_type === "whatsapp" ? (
-                        <a href={`https://wa.me/${post.contact_value}`} target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 underline">
+                        <span
+                          className="ml-1 text-blue-500 underline cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`https://wa.me/${post.contact_value}`, "_blank");
+                          }}
+                        >
                           {post.contact_value}
-                        </a>
+                        </span>
                       ) : (
-                        <a href={`mailto:${post.contact_value}`} className="ml-1 text-blue-500 underline">
+                        <span
+                          className="ml-1 text-blue-500 underline cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`mailto:${post.contact_value}`);
+                          }}
+                        >
                           {post.contact_value}
-                        </a>
+                        </span>
                       )}
                     </span>
                   </div>
