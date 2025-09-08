@@ -199,7 +199,7 @@ export default function Home() {
       // Refresca los posts inmediatamente
       // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
       setLoading(true)
-      let query = supabase.from("posts").select("*")
+      const query = supabase.from("posts").select("*")
       const start = 0
       const end = PAGE_SIZE - 1
       const { data, error: fetchError } = await query
