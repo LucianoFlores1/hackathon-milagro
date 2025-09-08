@@ -195,13 +195,26 @@ export default function Home() {
       setContactValue("") // Agregado
       setImageFile(null); // Limpiar el archivo de imagen
       setPage(0);
-      /* Original metodo de refresco de la pagina al publicar -> const { data } = await supabase.from("posts").select("*").order("id", { ascending: false })
-      if (data) setPosts(data as Post[]) */
+
+      // Refresca los posts inmediatamente
+      // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+      setLoading(true)
+      let query = supabase.from("posts").select("*")
+      const start = 0
+      const end = PAGE_SIZE - 1
+      const { data, error: fetchError } = await query
+        .order("created_at", { ascending: false })
+        .range(start, end)
+      if (!fetchError && data) {
+        setPosts(data as Post[])
+        setHasMore(data.length === PAGE_SIZE)
+
+      }
+      setLoading(false)
+      // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
     }
-
-    setLoading(false)
+    setLoading(false);
   }
-
   const handleClearFilters = () => {
     setFilterStatus("all");
     setFilterSpecies("all");
