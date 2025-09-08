@@ -28,6 +28,7 @@ type Post = {
   contact_type: string
   contact_value: string
   created_at: string
+  image_url: string | null
 }
 
 const PAGE_SIZE = 10;
@@ -67,6 +68,7 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(true)
+  const [imageFile, setImageFile] = useState<File | null>(null)
 
   // posts filtrados en memoria
   const filteredPosts = posts.filter((post) => {
@@ -136,9 +138,38 @@ export default function Home() {
       return
     }
 
-    setLoading(true)
-    setMessage(null)
+    setLoading(true);
+    setMessage(null);
 
+    let imageUrl = null;
+
+    if (imageFile) {
+      const fileName = `${Date.now()}-${imageFile.name}`
+      const filePath = `images/${fileName}` // usamos este
+
+      const { error: uploadError } = await supabase.storage
+        .from("post-images")
+        .upload(filePath, imageFile, {
+          cacheControl: "3600",
+          upsert: false,
+        })
+
+      if (uploadError) {
+        console.error("Error en upload:", uploadError.message)
+        setMessage("❌ Error al subir la imagen. Intenta de nuevo.")
+        setLoading(false)
+        return
+      }
+
+      // Obtener la URL pública de la imagen
+      const { data } = supabase.storage
+        .from("post-images")
+        .getPublicUrl(filePath)
+
+      if (data?.publicUrl) {
+        imageUrl = data.publicUrl
+      }
+    }
     const { error } = await supabase.from("posts").insert({
       title,
       description,
@@ -147,7 +178,8 @@ export default function Home() {
       zone_text: zoneText, // Agregado
       event_date: eventDate, // Agregado
       contact_type: contactType, // Agregado
-      contact_value: contactValue // Agregado
+      contact_value: contactValue, // Agregado
+      image_url: imageUrl, // 👈 nueva columna
     })
     if (error) {
       setMessage("❌ Error al crear el post. Intenta de nuevo.")
@@ -161,6 +193,7 @@ export default function Home() {
       setEventDate("") // Agregado
       setContactType("whatsapp") // Agregado
       setContactValue("") // Agregado
+      setImageFile(null); // Limpiar el archivo de imagen
       setPage(0);
       /* Original metodo de refresco de la pagina al publicar -> const { data } = await supabase.from("posts").select("*").order("id", { ascending: false })
       if (data) setPosts(data as Post[]) */
@@ -193,6 +226,18 @@ export default function Home() {
             <div className="space-y-2">
               <Label htmlFor="title">Título</Label>
               <Input id="title" placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="image">Foto</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) setImageFile(file)
+                }}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Estado</Label>
@@ -319,6 +364,14 @@ export default function Home() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
+                {post.image_url && (
+                  <img
+                    src={post.image_url}
+                    alt={post.title}
+                    className="w-full h-48 object-cover rounded-md"
+                  />
+                )}
+
                 <p className="text-sm text-gray-800">{post.description}</p>
                 <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                   <Badge variant="secondary" className="flex items-center gap-1">
