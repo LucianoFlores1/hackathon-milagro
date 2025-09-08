@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail, ArrowLeft } from "lucide-react"
 
 type Post = {
     id: string
@@ -28,6 +29,7 @@ const formatRelativeDate = (dateString: string): string => {
 
 export default function PostDetail() {
     const { id } = useParams()
+    const router = useRouter()
     const [post, setPost] = useState<Post | null>(null)
     const [loading, setLoading] = useState(true)
 
@@ -79,7 +81,15 @@ export default function PostDetail() {
     }
 
     return (
-        <div className="p-6 max-w-3xl mx-auto">
+        <div className="p-6 max-w-3xl mx-auto space-y-4">
+            {/* Botón para volver */}
+            <Button
+                variant="outline"
+                onClick={() => router.push("/")}
+                className="flex items-center gap-2"
+            >
+                <ArrowLeft className="w-4 h-4" /> Volver
+            </Button>
             <Card>
                 {post.image_url && (
                     <img
