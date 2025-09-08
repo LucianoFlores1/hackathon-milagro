@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail, ArrowLeft } from "lucide-react"
+import { Ripples } from 'ldrs/react'
+import 'ldrs/react/Ripples.css'
 
 type Post = {
     id: string
@@ -58,8 +60,9 @@ export default function PostDetail() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <p>Cargando post...</p>
+            <div className="flex flex-col items-center justify-center min-h-screen">
+                <Ripples size="45" speed="2" color="black" />
+                <p className="mt-4">Cargando post...</p>
             </div>
         );
     }
@@ -81,25 +84,29 @@ export default function PostDetail() {
     }
 
     return (
-        <div className="p-6 max-w-3xl mx-auto space-y-4">
+        <div className="p-6 max-w-3xl mx-auto space-y-6">
             {/* Botón para volver */}
             <Button
                 variant="outline"
-                onClick={() => router.push("/")}
+                onClick={() => {
+                    setLoading(true);
+                    router.push("/")
+                }
+                }
                 className="flex items-center gap-2"
             >
                 <ArrowLeft className="w-4 h-4" /> Volver
-            </Button>
-            <Card>
+            </Button >
+            <Card className="shadow-md">
                 {post.image_url && (
                     <img
                         src={post.image_url}
                         alt={post.title}
-                        className="w-full h-72 object-cover rounded-t-md"
+                        className="w-full max-h-[500px] object-contain rounded-md"
                     />
                 )}
                 <CardHeader>
-                    <CardTitle>{post.title}</CardTitle>
+                    <CardTitle className="text-2xl flex items-center justify-between">{post.title}</CardTitle>
                     <div className="flex gap-2 mt-2">
                         <Badge className={`${post.status === "lost" ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}>
                             {post.status === "lost" ? "Perdido" : "Encontrado"}
@@ -109,7 +116,7 @@ export default function PostDetail() {
                         </Badge>
                     </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-4">
                     <p>{post.description}</p>
                     <p className="flex items-center text-sm text-gray-600"><MapPin className="w-4 h-4 mr-1" /> **Zona:** {post.zone_text}</p>
                     <p className="flex items-center text-sm text-gray-600"><Calendar className="w-4 h-4 mr-1" /> **Fecha:** {formatRelativeDate(post.event_date)}</p>
@@ -125,6 +132,6 @@ export default function PostDetail() {
                     )}
                 </CardContent>
             </Card>
-        </div>
+        </div >
     )
 }
