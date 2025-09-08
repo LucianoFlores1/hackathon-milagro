@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail } from "lucide-react"
+import Link from "next/link"
 
 type Post = {
   id: string
@@ -363,67 +364,69 @@ export default function Home() {
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
         {posts.map((post) => (
-          <Card key={post.id} className="shadow-md flex flex-col justify-between">
-            <div>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  {post.title}
-                  <Badge
-                    variant="outline"
-                    className={`${post.status === "lost" ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
-                  >
-                    {post.status === "lost" ? "Perdido" : "Encontrado"}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {post.image_url && (
-                  <img
-                    src={post.image_url}
-                    alt={post.title}
-                    className="w-full h-48 object-cover rounded-md"
-                  />
-                )}
-
-                <p className="text-sm text-gray-800">{post.description}</p>
-                <div className="flex flex-wrap gap-2 text-sm text-gray-600">
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    {post.species === "dog" ? <Dog size={14} /> : post.species === "cat" ? <Cat size={14} /> : <PawPrint size={14} />}
-                    {post.species}
-                  </Badge>
-                  {post.zone_text && (
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                      <MapPin size={14} />
-                      {post.zone_text}
+          <Link href={`/posts/${post.id}`}>
+            <Card key={post.id} className="shadow-md flex flex-col justify-between">
+              <div>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    {post.title}
+                    <Badge
+                      variant="outline"
+                      className={`${post.status === "lost" ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
+                    >
+                      {post.status === "lost" ? "Perdido" : "Encontrado"}
                     </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {post.image_url && (
+                    <img
+                      src={post.image_url}
+                      alt={post.title}
+                      className="w-full h-48 object-cover rounded-md"
+                    />
                   )}
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <Calendar size={14} />
-                    {formatRelativeDate(post.event_date)}
-                  </Badge>
-                </div>
-              </CardContent>
-            </div>
-            {(post.contact_type || post.contact_value) && (
-              <CardContent>
-                <div className="flex items-center space-x-2 text-sm text-gray-600 mt-2">
-                  {post.contact_type === "whatsapp" ? <MessageCircle size={16} /> : <Mail size={16} />}
-                  <span>
-                    Contacto:
-                    {post.contact_type === "whatsapp" ? (
-                      <a href={`https://wa.me/${post.contact_value}`} target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 underline">
-                        {post.contact_value}
-                      </a>
-                    ) : (
-                      <a href={`mailto:${post.contact_value}`} className="ml-1 text-blue-500 underline">
-                        {post.contact_value}
-                      </a>
+
+                  <p className="text-sm text-gray-800">{post.description}</p>
+                  <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      {post.species === "dog" ? <Dog size={14} /> : post.species === "cat" ? <Cat size={14} /> : <PawPrint size={14} />}
+                      {post.species}
+                    </Badge>
+                    {post.zone_text && (
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        <MapPin size={14} />
+                        {post.zone_text}
+                      </Badge>
                     )}
-                  </span>
-                </div>
-              </CardContent>
-            )}
-          </Card>
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <Calendar size={14} />
+                      {formatRelativeDate(post.event_date)}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </div>
+              {(post.contact_type || post.contact_value) && (
+                <CardContent>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600 mt-2">
+                    {post.contact_type === "whatsapp" ? <MessageCircle size={16} /> : <Mail size={16} />}
+                    <span>
+                      Contacto:
+                      {post.contact_type === "whatsapp" ? (
+                        <a href={`https://wa.me/${post.contact_value}`} target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 underline">
+                          {post.contact_value}
+                        </a>
+                      ) : (
+                        <a href={`mailto:${post.contact_value}`} className="ml-1 text-blue-500 underline">
+                          {post.contact_value}
+                        </a>
+                      )}
+                    </span>
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+          </Link>
         ))}
       </div>
 
