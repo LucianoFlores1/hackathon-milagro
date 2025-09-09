@@ -246,27 +246,32 @@ export default function Home() {
         >{message}</p>
       )}
 
-      <Card className={`transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1000px]" : "max-h-0"} `}
+      <Card className={`p-0 transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1000px]" : "max-h-15"} `}
       >
         <Button
           variant="outline"
-          className="mb-4 w-full"
+          className="rounded-xl px-4 py-2 shadow-md 
+             hover:shadow-lg hover:scale-[1.02] 
+             transition-all duration-300"
           onClick={() => setShowForm(!showForm)}>
 
           {showForm ? "Ocultar formulario de publicación" : "➕ Publicar un aviso"}
         </Button>
         {showForm && (
           <div className="bg-gray-100 p-6 rounded-lg shadow-md space-y-4">
-            <h2 className="text-2xl font-semibold text-center">Publicar un Nuevo Post</h2>
+            <h2 className="text-2xl font-semibold text-center">Publicar un Aviso</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Título</Label>
-                  <Input id="title" placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
+                  <Input className="rounded-lg border-gray-300 focus:border-blue-500 
+             focus:ring focus:ring-blue-200 transition duration-200" id="title" placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="image">Foto</Label>
                   <Input
+                    className="rounded-lg border-gray-300 focus:border-blue-500 
+             focus:ring focus:ring-blue-200 transition duration-200"
                     id="image"
                     type="file"
                     accept="image/*"
@@ -301,17 +306,19 @@ export default function Home() {
 
               <div className="space-y-2">
                 <Label htmlFor="description">Descripción</Label>
-                <Textarea id="description" placeholder="Descripción detallada del animal..." value={description} onChange={(e) => setDescription(e.target.value)} />
+                <Textarea id="description" placeholder="Descripción detallada de tu mascota..." value={description} onChange={(e) => setDescription(e.target.value)} />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="zone">Zona aproximada</Label>
-                  <Input id="zone" placeholder="Ej: Cerrillos" value={zoneText} onChange={(e) => setZoneText(e.target.value)} />
+                  <Input className="rounded-lg border-gray-300 focus:border-blue-500 
+             focus:ring focus:ring-blue-200 transition duration-200" id="zone" placeholder="Ej: Cerrillos" value={zoneText} onChange={(e) => setZoneText(e.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="event-date">Fecha del hecho</Label>
-                  <Input id="event-date" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
+                  <Input id="event-date" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="rounded-lg border-gray-300 focus:border-blue-500 
+             focus:ring focus:ring-blue-200 transition duration-200" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="contact-type">Tipo de contacto</Label>
@@ -327,9 +334,12 @@ export default function Home() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="contact-value">Valor de contacto</Label>
-                <Input id="contact-value" placeholder="Ej: 3811234567 o email@ejemplo.com" value={contactValue} onChange={(e) => setContactValue(e.target.value)} />
+                <Input id="contact-value" placeholder="Ej: 3811234567 o email@ejemplo.com" value={contactValue} onChange={(e) => setContactValue(e.target.value)} className="rounded-lg border-gray-300 focus:border-blue-500 
+             focus:ring focus:ring-blue-200 transition duration-200"/>
               </div>
-              <Button type="submit" disabled={loading} className="w-full">
+              <Button type="submit" disabled={loading} className="rounded-xl px-4 py-2 shadow-md 
+             hover:shadow-lg hover:scale-[1.02] 
+             transition-all duration-300">
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -344,14 +354,17 @@ export default function Home() {
         )}
       </Card>
 
-      <Card className="p-4 shadow-md">
+      <Card className="p-3 rounded-xl shadow-md hover:shadow-lg 
+             hover:scale-[1.02] transition-all duration-300">
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-end gap-4">
             <div className="space-y-2 flex-grow">
               <Label htmlFor="search">Buscar por título o descripción</Label>
               <Input
+                className="rounded-lg border-gray-300 focus:border-blue-500 
+             focus:ring focus:ring-blue-200 transition duration-200"
                 id="search"
-                placeholder="Buscar por título o descripción..."
+                placeholder="Puede que alguien haya encontrado a tu mascota, prueba suerte..."
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -393,7 +406,9 @@ export default function Home() {
               </div>
             </div>
             {/* Botón limpiar */}
-            <Button onClick={handleClearFilters} className="w-full md:w-auto mt-2 md:mt-0" variant={"default"} >
+            <Button onClick={handleClearFilters} className="w-full md:w-auto mt-2 md:mt-0 rounded-xl px-4 py-2 shadow-md 
+             hover:shadow-lg hover:scale-[1.02] 
+             transition-all duration-300" variant={"default"} >
               Limpiar filtros
             </Button>
           </div>
@@ -416,7 +431,8 @@ export default function Home() {
       )}
 
       {hasMore && (
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-4 rounded-xl px-4 py-2 hover:shadow-lg hover:scale-[1.02] 
+             transition-all duration-300">
           <Button onClick={() => setPage(page + 1)} disabled={loading}>
             {loading ? <Spinner /> : "Cargar más posts"}
           </Button>
