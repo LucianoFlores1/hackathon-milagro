@@ -21,6 +21,7 @@ import { Spinner } from "@/components/ui/Spinner"
 import PostCard from "@/components/ui/PostCard"
 import Alert from "@/components/ui/Alert"
 import { PostSkeleton } from "@/components/ui/PostSkeleton"
+import { useRouter } from "next/navigation";
 
 type Post = {
   id: string
@@ -76,6 +77,8 @@ export default function Home() {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [showForm, setShowForm] = useState(false);
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [navigating, setNavigating] = useState(false);
+  const router = useRouter();
 
   // posts filtrados en memoria
   const filteredPosts = posts.filter((post) => {
@@ -231,9 +234,17 @@ export default function Home() {
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
+      {navigating && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
+          <div className="flex flex-col items-center">
+            <Spinner />
+            <span className="mt-2 text-white text-lg drop-shadow">Cargando...</span>
+          </div>
+        </div>
+      )}
       <header className="sticky top-0 z-50 bg-white shadow-md">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-blue-600">🐾 Mi Amigo Fiel</h1>
+          <h1 className="text-xl font-bold text-blue-600">🐾 Amigos Fieles</h1>
           <nav className="space-x-4">
             <Link href="/" className="text-gray-700 hover:text-blue-600">Inicio</Link>
             <button onClick={() => {
@@ -443,7 +454,12 @@ export default function Home() {
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-8">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} href={`/posts/${post.id}`} />
+            <div key={post.id} onClick={() => {
+              setNavigating(true);
+              router.push(`/posts/${post.id}`);
+            }}>
+              <PostCard post={post} />
+            </div>
           ))}
         </div>
       )}
