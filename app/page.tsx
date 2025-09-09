@@ -238,7 +238,7 @@ export default function Home() {
       <Card className="p-4 shadow-md">
         <Button
           variant="outline"
-          className="w-full"
+          className={`transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1000px]" : "max-h-0"} `}
           onClick={() => setShowForm(!showForm)}>
 
           {showForm ? "Ocultar formulario de publicación" : "➕ Publicar un aviso"}
