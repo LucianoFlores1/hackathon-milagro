@@ -19,6 +19,7 @@ import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail, Loader2 } fr
 import Link from "next/link"
 import { Spinner } from "@/components/ui/Spinner"
 import Alert from "@/components/ui/Alert"
+import { PostSkeleton } from "@/components/ui/PostSkeleton"
 
 type Post = {
   id: string
@@ -398,85 +399,94 @@ export default function Home() {
         </div>
       </Card>
       <h2 className="text-2xl font-bold">Posts Recientes</h2>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-        {posts.map((post) => (
-          <Link key={post.id} href={`/posts/${post.id}`}>
-            <Card className="shadow-md flex flex-col justify-between hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
-              <div>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    {post.title}
-                    <Badge
-                      variant="outline"
-                      className={`${post.status === "lost" ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
-                    >
-                      {post.status === "lost" ? "Perdido" : "Encontrado"}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {post.image_url && (
-                    <img
-                      src={post.image_url}
-                      alt={post.title}
-                      className="w-full h-48 object-cover rounded-md"
-                    />
-                  )}
-
-                  <p className="text-sm text-gray-800">{post.description}</p>
-                  <div className="flex flex-wrap gap-2 text-sm text-gray-600">
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                      {post.species === "dog" ? <Dog size={14} /> : post.species === "cat" ? <Cat size={14} /> : <PawPrint size={14} />}
-                      {post.species}
-                    </Badge>
-                    {post.zone_text && (
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <MapPin size={14} />
-                        {post.zone_text}
+      {/* Solo renderiza los posts o skeletons una vez, según el estado de loading */}
+      {loading ? (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-8">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <PostSkeleton key={i} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-8">
+          {posts.map((post) => (
+            <Link key={post.id} href={`/posts/${post.id}`}>
+              <Card className="transform transition-all duration-500 ease-out hover:scale-105 hover:shadow-xl animate-fadeIn">
+                <div>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      {post.title}
+                      <Badge
+                        variant="outline"
+                        className={`${post.status === "lost" ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
+                      >
+                        {post.status === "lost" ? "Perdido" : "Encontrado"}
                       </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {post.image_url && (
+                      <img
+                        src={post.image_url}
+                        alt={post.title}
+                        className="w-full h-48 object-cover rounded-md"
+                      />
                     )}
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                      <Calendar size={14} />
-                      {formatRelativeDate(post.event_date)}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </div>
-              {(post.contact_type || post.contact_value) && (
-                <CardContent>
-                  <div className="flex items-center space-x-2 text-sm text-gray-600 mt-2">
-                    {post.contact_type === "whatsapp" ? <MessageCircle size={16} /> : <Mail size={16} />}
-                    <span>
-                      Contacto:
-                      {post.contact_type === "whatsapp" ? (
-                        <span
-                          className="ml-1 text-blue-500 underline cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(`https://wa.me/${post.contact_value}`, "_blank");
-                          }}
-                        >
-                          {post.contact_value}
-                        </span>
-                      ) : (
-                        <span
-                          className="ml-1 text-blue-500 underline cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(`mailto:${post.contact_value}`);
-                          }}
-                        >
-                          {post.contact_value}
-                        </span>
+
+                    <p className="text-sm text-gray-800">{post.description}</p>
+                    <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        {post.species === "dog" ? <Dog size={14} /> : post.species === "cat" ? <Cat size={14} /> : <PawPrint size={14} />}
+                        {post.species}
+                      </Badge>
+                      {post.zone_text && (
+                        <Badge variant="secondary" className="flex items-center gap-1">
+                          <MapPin size={14} />
+                          {post.zone_text}
+                        </Badge>
                       )}
-                    </span>
-                  </div>
-                </CardContent>
-              )}
-            </Card>
-          </Link>
-        ))}
-      </div>
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        <Calendar size={14} />
+                        {formatRelativeDate(post.event_date)}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </div>
+                {(post.contact_type || post.contact_value) && (
+                  <CardContent>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 mt-2">
+                      {post.contact_type === "whatsapp" ? <MessageCircle size={16} /> : <Mail size={16} />}
+                      <span>
+                        Contacto:
+                        {post.contact_type === "whatsapp" ? (
+                          <span
+                            className="ml-1 text-blue-500 underline cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(`https://wa.me/${post.contact_value}`, "_blank");
+                            }}
+                          >
+                            {post.contact_value}
+                          </span>
+                        ) : (
+                          <span
+                            className="ml-1 text-blue-500 underline cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(`mailto:${post.contact_value}`);
+                            }}
+                          >
+                            {post.contact_value}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  </CardContent>
+                )}
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {hasMore && (
         <div className="flex justify-center mt-4">
