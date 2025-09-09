@@ -70,6 +70,7 @@ export default function Home() {
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(true)
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const [showForm, setShowForm] = useState(false);
 
   // posts filtrados en memoria
   const filteredPosts = posts.filter((post) => {
@@ -233,134 +234,147 @@ export default function Home() {
         >{message}</p>
       )}
 
-      <div className="bg-gray-100 p-6 rounded-lg shadow-md space-y-4">
-        <h2 className="text-2xl font-semibold text-center">Publicar un Nuevo Post</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Título</Label>
-              <Input id="title" placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="image">Foto</Label>
+      <Card className="p-4 shadow-md">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => setShowForm(!showForm)}>
+
+          {showForm ? "Ocultar formulario de publicación" : "➕ Publicar un aviso"}
+        </Button>
+        {showForm && (
+          <div className="bg-gray-100 p-6 rounded-lg shadow-md space-y-4">
+            <h2 className="text-2xl font-semibold text-center">Publicar un Nuevo Post</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Título</Label>
+                  <Input id="title" placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="image">Foto</Label>
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) setImageFile(file)
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status">Estado</Label>
+                  <Select value={status} onValueChange={setStatus}>
+                    <SelectTrigger id="status"><SelectValue placeholder="Selecciona el estado" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="lost">Perdido</SelectItem>
+                      <SelectItem value="found">Encontrado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="species">Especie</Label>
+                  <Select value={species} onValueChange={setSpecies}>
+                    <SelectTrigger id="species"><SelectValue placeholder="Selecciona la especie" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dog">Perro</SelectItem>
+                      <SelectItem value="cat">Gato</SelectItem>
+                      <SelectItem value="other">Otro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Descripción</Label>
+                <Textarea id="description" placeholder="Descripción detallada del animal..." value={description} onChange={(e) => setDescription(e.target.value)} />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="zone">Zona aproximada</Label>
+                  <Input id="zone" placeholder="Ej: Cerrillos" value={zoneText} onChange={(e) => setZoneText(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="event-date">Fecha del hecho</Label>
+                  <Input id="event-date" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="contact-type">Tipo de contacto</Label>
+                  <Select value={contactType} onValueChange={setContactType}>
+                    <SelectTrigger id="contact-type"><SelectValue placeholder="Selecciona el tipo de contacto" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                      <SelectItem value="email">Email</SelectItem>
+                      <SelectItem value="form">Formulario</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contact-value">Valor de contacto</Label>
+                <Input id="contact-value" placeholder="Ej: 3811234567 o email@ejemplo.com" value={contactValue} onChange={(e) => setContactValue(e.target.value)} />
+              </div>
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? "Creando..." : "Crear Post"}
+              </Button>
+            </form>
+          </div>
+        )}
+      </Card>
+
+      <Card className="p-4 shadow-md">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold">Posts Recientes</h2>
+          <div className="flex flex-col md:flex-row md:items-end gap-4">
+            <div className="space-y-2 flex-grow">
+              <Label htmlFor="search">Buscar por título o descripción</Label>
               <Input
-                id="image"
-                type="file"
-                accept="image/*"
+                id="search"
+                placeholder="Buscar por título o descripción..."
+                value={searchTerm}
                 onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) setImageFile(file)
+                  setSearchTerm(e.target.value);
+                  setPage(0);
                 }}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="status">Estado</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger id="status"><SelectValue placeholder="Selecciona el estado" /></SelectTrigger>
+              <Label htmlFor="filter-status">Filtrar por estado</Label>
+              <Select value={filterStatus} onValueChange={(value) => {
+                setFilterStatus(value);
+                setPage(0);
+              }}>
+                <SelectTrigger id="filter-status"><SelectValue placeholder="Todos" /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="lost">Perdido</SelectItem>
                   <SelectItem value="found">Encontrado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="species">Especie</Label>
-              <Select value={species} onValueChange={setSpecies}>
-                <SelectTrigger id="species"><SelectValue placeholder="Selecciona la especie" /></SelectTrigger>
+              <Label htmlFor="filter-species">Filtrar por especie</Label>
+              <Select value={filterSpecies} onValueChange={(value) => {
+                setFilterSpecies(value);
+                setPage(0);
+              }}>
+                <SelectTrigger id="filter-species"><SelectValue placeholder="Todas" /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
                   <SelectItem value="dog">Perro</SelectItem>
                   <SelectItem value="cat">Gato</SelectItem>
                   <SelectItem value="other">Otro</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            <Button onClick={handleClearFilters} className="self-end md:w-auto">
+              Limpiar filtros
+            </Button>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Descripción</Label>
-            <Textarea id="description" placeholder="Descripción detallada del animal..." value={description} onChange={(e) => setDescription(e.target.value)} />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="zone">Zona aproximada</Label>
-              <Input id="zone" placeholder="Ej: Cerrillos" value={zoneText} onChange={(e) => setZoneText(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="event-date">Fecha del hecho</Label>
-              <Input id="event-date" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="contact-type">Tipo de contacto</Label>
-              <Select value={contactType} onValueChange={setContactType}>
-                <SelectTrigger id="contact-type"><SelectValue placeholder="Selecciona el tipo de contacto" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                  <SelectItem value="email">Email</SelectItem>
-                  <SelectItem value="form">Formulario</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="contact-value">Valor de contacto</Label>
-            <Input id="contact-value" placeholder="Ej: 3811234567 o email@ejemplo.com" value={contactValue} onChange={(e) => setContactValue(e.target.value)} />
-          </div>
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Creando..." : "Crear Post"}
-          </Button>
-        </form>
-      </div>
-
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Posts Recientes</h2>
-        <div className="flex flex-col md:flex-row md:items-end gap-4">
-          <div className="space-y-2 flex-grow">
-            <Label htmlFor="search">Buscar por título o descripción</Label>
-            <Input
-              id="search"
-              placeholder="Buscar por título o descripción..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setPage(0);
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="filter-status">Filtrar por estado</Label>
-            <Select value={filterStatus} onValueChange={(value) => {
-              setFilterStatus(value);
-              setPage(0);
-            }}>
-              <SelectTrigger id="filter-status"><SelectValue placeholder="Todos" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="lost">Perdido</SelectItem>
-                <SelectItem value="found">Encontrado</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="filter-species">Filtrar por especie</Label>
-            <Select value={filterSpecies} onValueChange={(value) => {
-              setFilterSpecies(value);
-              setPage(0);
-            }}>
-              <SelectTrigger id="filter-species"><SelectValue placeholder="Todas" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="dog">Perro</SelectItem>
-                <SelectItem value="cat">Gato</SelectItem>
-                <SelectItem value="other">Otro</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <Button onClick={handleClearFilters} className="self-end md:w-auto">
-            Limpiar filtros
-          </Button>
         </div>
-      </div>
+      </Card>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
         {posts.map((post) => (
