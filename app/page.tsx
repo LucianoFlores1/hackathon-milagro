@@ -238,7 +238,7 @@ export default function Home() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
           <div className="flex flex-col items-center">
             <Spinner />
-            <span className="mt-2 text-white text-lg drop-shadow">Cargando...</span>
+
           </div>
         </div>
       )}
