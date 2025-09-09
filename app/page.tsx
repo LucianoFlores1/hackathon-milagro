@@ -326,7 +326,6 @@ export default function Home() {
 
       <Card className="p-4 shadow-md">
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Posts Recientes</h2>
           <div className="flex flex-col md:flex-row md:items-end gap-4">
             <div className="space-y-2 flex-grow">
               <Label htmlFor="search">Buscar por título o descripción</Label>
@@ -340,42 +339,47 @@ export default function Home() {
                 }}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="filter-status">Filtrar por estado</Label>
-              <Select value={filterStatus} onValueChange={(value) => {
-                setFilterStatus(value);
-                setPage(0);
-              }}>
-                <SelectTrigger id="filter-status"><SelectValue placeholder="Todos" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="lost">Perdido</SelectItem>
-                  <SelectItem value="found">Encontrado</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex gap-4 w-full">
+              {/* Filtro por estado */}
+              <div className="space-y-2 w-full md:w-40">
+                <Label htmlFor="filter-status">Estado</Label>
+                <Select value={filterStatus} onValueChange={(value) => {
+                  setFilterStatus(value);
+                  setPage(0);
+                }}>
+                  <SelectTrigger id="filter-status"><SelectValue placeholder="Todos" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="lost">Perdido</SelectItem>
+                    <SelectItem value="found">Encontrado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Filtro por especie */}
+              <div className="space-y-2 w-full md:w-40">
+                <Label htmlFor="filter-species">Especie</Label>
+                <Select value={filterSpecies} onValueChange={(value) => {
+                  setFilterSpecies(value);
+                  setPage(0);
+                }}>
+                  <SelectTrigger id="filter-species"><SelectValue placeholder="Todas" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="dog">Perro</SelectItem>
+                    <SelectItem value="cat">Gato</SelectItem>
+                    <SelectItem value="other">Otro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="filter-species">Filtrar por especie</Label>
-              <Select value={filterSpecies} onValueChange={(value) => {
-                setFilterSpecies(value);
-                setPage(0);
-              }}>
-                <SelectTrigger id="filter-species"><SelectValue placeholder="Todas" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  <SelectItem value="dog">Perro</SelectItem>
-                  <SelectItem value="cat">Gato</SelectItem>
-                  <SelectItem value="other">Otro</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button onClick={handleClearFilters} className="self-end md:w-auto">
+            {/* Botón limpiar */}
+            <Button onClick={handleClearFilters} className="w-full md:w-auto mt-2 md:mt-0" variant={"default"} >
               Limpiar filtros
             </Button>
           </div>
         </div>
       </Card>
-
+      <h2 className="text-2xl font-bold">Posts Recientes</h2>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
         {posts.map((post) => (
           <Link key={post.id} href={`/posts/${post.id}`}>
