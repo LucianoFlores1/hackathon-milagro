@@ -231,6 +231,23 @@ export default function Home() {
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
+      <header className="sticky top-0 z-50 bg-white shadow-md">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <h1 className="text-xl font-bold text-blue-600">🐾 Mi Amigo Fiel</h1>
+          <nav className="space-x-4">
+            <a href="/" className="text-gray-700 hover:text-blue-600">Inicio</a>
+            <button onClick={() => {
+              setShowForm(true);
+              setTimeout(() => {
+                const el = document.getElementById("create-post");
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              }, 50);
+            }} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Publicar</button>
+          </nav>
+        </div>
+      </header>
       {alert && (
         <Alert
           type={alert.type}
@@ -260,7 +277,7 @@ export default function Home() {
         {showForm && (
           <div className="bg-gray-100 p-6 rounded-lg shadow-md space-y-4">
             <h2 className="text-2xl font-semibold text-center">Publicar un Aviso</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form id="create-post" onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Título</Label>
@@ -354,6 +371,7 @@ export default function Home() {
         )}
       </Card>
 
+      {/* Taerjeta de busqueda y los filtros */}
       <Card className="p-3 rounded-xl shadow-md hover:shadow-lg 
              hover:scale-[1.02] transition-all duration-300">
         <div className="space-y-4">
@@ -438,6 +456,10 @@ export default function Home() {
           </Button>
         </div>
       )}
+      <footer className="mt-12 bg-gray-100 py-4 text-center text-sm text-gray-600">
+        © 2025 Milagro Pets – Hackathon del Milagro 🐶🐱
+      </footer>
+
     </div>
   );
 }
