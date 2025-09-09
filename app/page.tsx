@@ -235,7 +235,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-bold text-blue-600">🐾 Mi Amigo Fiel</h1>
           <nav className="space-x-4">
-            <a href="/" className="text-gray-700 hover:text-blue-600">Inicio</a>
+            <Link href="/" className="text-gray-700 hover:text-blue-600">Inicio</Link>
             <button onClick={() => {
               setShowForm(true);
               setTimeout(() => {
