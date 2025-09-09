@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail } from "lucide-react"
 import Link from "next/link"
+import { Spinner } from "@/components/ui/Spinner"
 
 type Post = {
   id: string
@@ -383,7 +384,7 @@ export default function Home() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
         {posts.map((post) => (
           <Link key={post.id} href={`/posts/${post.id}`}>
-            <Card className="shadow-md flex flex-col justify-between hover:shadow-lg cursor-pointer transition-shadow">
+            <Card className="transform transition-all duration-500 ease-out hover:scale-105 hover:shadow-xl animate-fadeIn">
               <div>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
@@ -463,7 +464,7 @@ export default function Home() {
       {hasMore && (
         <div className="flex justify-center mt-4">
           <Button onClick={() => setPage(page + 1)} disabled={loading}>
-            {loading ? "Cargando..." : "Cargar más posts"}
+            {loading ? <Spinner /> : "Cargar más posts"}
           </Button>
         </div>
       )}
