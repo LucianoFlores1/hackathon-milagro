@@ -235,10 +235,11 @@ export default function Home() {
         >{message}</p>
       )}
 
-      <Card className="p-4 shadow-md">
+      <Card className={`transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1000px]" : "max-h-0"} `}
+      >
         <Button
           variant="outline"
-          className={`transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1000px]" : "max-h-0"} `}
+          className="mb-4 w-full"
           onClick={() => setShowForm(!showForm)}>
 
           {showForm ? "Ocultar formulario de publicación" : "➕ Publicar un aviso"}
@@ -384,7 +385,7 @@ export default function Home() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
         {posts.map((post) => (
           <Link key={post.id} href={`/posts/${post.id}`}>
-            <Card className="transform transition-all duration-500 ease-out hover:scale-105 hover:shadow-xl animate-fadeIn">
+            <Card className="shadow-md flex flex-col justify-between hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
               <div>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
