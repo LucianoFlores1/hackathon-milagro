@@ -15,9 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail } from "lucide-react"
+import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { Spinner } from "@/components/ui/Spinner"
+import Alert from "@/components/ui/Alert"
 
 type Post = {
   id: string
@@ -72,6 +73,7 @@ export default function Home() {
   const [hasMore, setHasMore] = useState(true)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [showForm, setShowForm] = useState(false);
+  const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   // posts filtrados en memoria
   const filteredPosts = posts.filter((post) => {
@@ -129,15 +131,15 @@ export default function Home() {
 
     // 🔎 Validaciones simples
     if (!title.trim() || !description.trim()) {
-      setMessage("El título y la descripción son obligatorios.")
+      setAlert({ type: "error", message: "El título y la descripción son obligatorios." })
       return
     }
     if (!contactValue.trim()) {
-      setMessage("❌ Debes ingresar un valor de contacto.")
+      setAlert({ type: "error", message: "Debes ingresar un valor de contacto." })
       return
     }
     if (eventDate && new Date(eventDate) > new Date()) {
-      setMessage("❌ La fecha no puede ser futura.")
+      setAlert({ type: "error", message: "La fecha no puede ser futura." })
       return
     }
 
@@ -159,7 +161,7 @@ export default function Home() {
 
       if (uploadError) {
         console.error("Error en upload:", uploadError.message)
-        setMessage("❌ Error al subir la imagen. Intenta de nuevo.")
+        setAlert({ type: "error", message: "Error al subir la imagen. Intenta de nuevo." })
         setLoading(false)
         return
       }
@@ -185,9 +187,9 @@ export default function Home() {
       image_url: imageUrl, // 👈 nueva columna
     })
     if (error) {
-      setMessage("❌ Error al crear el post. Intenta de nuevo.")
+      setAlert({ type: "error", message: "Error al crear el post. Intenta de nuevo." })
     } else {
-      setMessage("✅ Post creado exitosamente.")
+      setAlert({ type: "success", message: "Post creado exitosamente." })
       setTitle("")
       setDescription("")
       setStatus("lost")
@@ -227,6 +229,13 @@ export default function Home() {
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
+      {alert && (
+        <Alert
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
       <h1 className="text-3xl font-bold text-center">Mascotas Perdidas y Encontradas</h1>
 
       {message && (
@@ -319,7 +328,14 @@ export default function Home() {
                 <Input id="contact-value" placeholder="Ej: 3811234567 o email@ejemplo.com" value={contactValue} onChange={(e) => setContactValue(e.target.value)} />
               </div>
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Creando..." : "Crear Post"}
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Publicando...
+                  </>
+                ) : (
+                  "Publicar"
+                )}
               </Button>
             </form>
           </div>
