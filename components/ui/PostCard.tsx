@@ -61,7 +61,7 @@ const PostCard = ({ post, href }: PostCardProps) => {
                             className="w-full h-48 object-cover rounded-md"
                         />
                     )}
-                    <p className="text-sm text-gray-800">{post.description}</p>
+                    <p className="text-sm text-gray-700 line-clamp-1">{post.description}</p>
                     <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                         <Badge variant="secondary" className="flex items-center gap-1">
                             {post.species === "dog" ? <Dog size={14} /> : post.species === "cat" ? <Cat size={14} /> : <PawPrint size={14} />}

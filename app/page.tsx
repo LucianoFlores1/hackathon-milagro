@@ -273,7 +273,7 @@ export default function Home() {
       )}
       <header className="sticky top-0 z-50 bg-white shadow-md">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-blue-600">🐾 Amigos Fieles</h1>
+          <h1 className="text-xl font-bold text-blue-600">🐾 Mi Fiel Amigo</h1>
           <nav className="space-x-4">
             <Link href="/" className="text-gray-700 hover:text-blue-600">Inicio</Link>
             <button onClick={() => {
@@ -284,7 +284,7 @@ export default function Home() {
                   el.scrollIntoView({ behavior: "smooth" });
                 }
               }, 50);
-            }} className="bg-blue-600 text-white w-full md:w-auto mt-2 md:mt-0 rounded-xl px-4 py-2 shadow-md 
+            }} className="bg-blue-600 text-white w-full md:w-auto mt-2 md:mt-0 rounded-xl px-2 py-2 shadow-md 
             hover:shadow-lg hover:scale-[1.02] 
             transition-all duration-300">Publicar</button>
           </nav>
@@ -305,7 +305,7 @@ export default function Home() {
         >{message}</p>
       )}
 
-      <Card className={`p-0 transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1200px]" : "max-h-15"} `}
+      <Card className={`p-0 transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1300px]" : "max-h-15"} `}
       >
         <Button
           variant="outline"
@@ -460,18 +460,19 @@ export default function Home() {
         )}
       </Card>
 
-      {/* Taerjeta de busqueda y los filtros */}
-      <Card className="p-3 rounded-xl shadow-md hover:shadow-lg 
-             hover:scale-[1.02] transition-all duration-300">
-        <div className="space-y-4">
-          <div className="flex flex-col md:flex-row md:items-end gap-4">
+      {/* Tarjeta de búsqueda y filtros mejorada */}
+      <Card className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-blue-50 via-white to-blue-100 border border-blue-200">
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end gap-6">
             <div className="space-y-2 flex-grow">
-              <Label htmlFor="search">Buscar por título o descripción</Label>
+              <Label htmlFor="search" className="font-semibold text-blue-700 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" /></svg>
+                Buscar por título o descripción
+              </Label>
               <Input
-                className="rounded-lg border-gray-300 focus:border-blue-500 
-             focus:ring focus:ring-blue-200 transition duration-200"
+                className="rounded-xl border-blue-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200 bg-white shadow-sm px-4 py-2"
                 id="search"
-                placeholder="Puede que alguien haya encontrado a tu mascota, prueba suerte..."
+                placeholder="Ej: Firulais perdido en Cerrillos..."
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -481,13 +482,18 @@ export default function Home() {
             </div>
             <div className="flex gap-4 w-full">
               {/* Filtro por estado */}
-              <div className="space-y-2 w-full md:w-40">
-                <Label htmlFor="filter-status">Estado</Label>
+              <div className="space-y-2 w-full md:w-44">
+                <Label htmlFor="filter-status" className="font-semibold text-blue-700 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                  Estado
+                </Label>
                 <Select value={filterStatus} onValueChange={(value) => {
                   setFilterStatus(value);
                   setPage(0);
                 }}>
-                  <SelectTrigger id="filter-status"><SelectValue placeholder="Todos" /></SelectTrigger>
+                  <SelectTrigger id="filter-status" className="rounded-xl border-blue-300 focus:border-blue-500 bg-white shadow-sm px-4 py-2">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="lost">Perdido</SelectItem>
@@ -496,13 +502,18 @@ export default function Home() {
                 </Select>
               </div>
               {/* Filtro por especie */}
-              <div className="space-y-2 w-full md:w-40">
-                <Label htmlFor="filter-species">Especie</Label>
+              <div className="space-y-2 w-full md:w-44">
+                <Label htmlFor="filter-species" className="font-semibold text-blue-700 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                  Especie
+                </Label>
                 <Select value={filterSpecies} onValueChange={(value) => {
                   setFilterSpecies(value);
                   setPage(0);
                 }}>
-                  <SelectTrigger id="filter-species"><SelectValue placeholder="Todas" /></SelectTrigger>
+                  <SelectTrigger id="filter-species" className="rounded-xl border-blue-300 focus:border-blue-500 bg-white shadow-sm px-4 py-2">
+                    <SelectValue placeholder="Todas" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todas</SelectItem>
                     <SelectItem value="dog">Perro</SelectItem>
@@ -513,9 +524,7 @@ export default function Home() {
               </div>
             </div>
             {/* Botón limpiar */}
-            <Button onClick={handleClearFilters} className="w-full md:w-auto mt-2 md:mt-0 rounded-xl px-4 py-2 shadow-md 
-             hover:shadow-lg hover:scale-[1.02] 
-             transition-all duration-300" variant={"default"} >
+            <Button onClick={handleClearFilters} className="w-full md:w-auto mt-2 md:mt-0 rounded-xl px-4 py-2 shadow-md bg-blue-500 text-white font-semibold hover:bg-blue-600 hover:scale-105 transition-all duration-300" variant={"default"} >
               Limpiar filtros
             </Button>
           </div>
