@@ -59,6 +59,7 @@ const formatRelativeDate = (dateString: string): string => {
 };
 
 export default function Home() {
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [status, setStatus] = useState("lost")
@@ -272,7 +273,7 @@ export default function Home() {
         >{message}</p>
       )}
 
-      <Card className={`p-0 transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1000px]" : "max-h-15"} `}
+      <Card className={`p-0 transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1200px]" : "max-h-15"} `}
       >
         <Button
           variant="outline"
@@ -305,10 +306,28 @@ export default function Home() {
                     type="file"
                     accept="image/*"
                     onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) setImageFile(file)
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setImageFile(file);
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setImagePreview(reader.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      } else {
+                        setImagePreview(null);
+                        setImageFile(null);
+                      }
                     }}
                   />
+                  {imagePreview && (
+                    <div className="mt-2">
+                      <img src={imagePreview} alt="Vista previa" className="w-full max-h-48 object-contain rounded-lg border" />
+                      <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => { setImagePreview(null); setImageFile(null); }}>
+                        Quitar imagen
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="status">Estado</Label>
