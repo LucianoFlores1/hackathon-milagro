@@ -16,6 +16,7 @@ export type Post = {
     created_at: string;
     image_url: string | null;
     resolved?: boolean;
+    contact_hidden?: boolean;
 };
 
 export function formatRelativeDate(dateString: string): string {
@@ -87,6 +88,10 @@ const PostCard = ({ post, href }: PostCardProps) => {
                             {post.status === "lost" ? "Perdido" : "Encontrado"}
                         </Badge>
                     </CardTitle>
+                    {post.contact_hidden && (
+                        <div className="mt-2 text-center text-yellow-700 font-bold text-lg">
+                        </div>
+                    )}
                 </CardHeader>
                 <CardContent className="space-y-2">
                     {post.image_url && (
@@ -118,7 +123,15 @@ const PostCard = ({ post, href }: PostCardProps) => {
             {/* Contacto solo si no está resuelto */}
             {(!post.resolved && (post.contact_type || post.contact_value)) && (
                 <CardContent>
-                    <div className="flex items-center space-x-2 text-sm text-gray-600 mt-2">
+                    {/* Cartel de revisión por reportes */}
+                    {post.contact_hidden && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-yellow-200/90 z-30">
+                            <span className="text-yellow-800 font-bold text-xl text-center px-4">
+                                🕵️‍♂️<br />Este post está en revisión por reportes de la comunidad
+                            </span>
+                        </div>
+                    )}
+                    <div>
                         {post.contact_type === "whatsapp" ? <MessageCircle size={16} /> : <Mail size={16} />}
                         <span>
                             Contacto:

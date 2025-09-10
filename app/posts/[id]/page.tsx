@@ -26,6 +26,8 @@ type Post = {
     image_url: string | null
     resolved?: boolean
     edit_token?: string
+    reports_count?: number
+    contact_hidden?: boolean
 }
 
 function ContactButton({ type, value }: { type: string; value: string }) {
@@ -65,11 +67,15 @@ function ContactButton({ type, value }: { type: string; value: string }) {
 }
 
 export default function PostDetail() {
+    const REPORT_THRESHOLD = 3;
     const params = useParams()
     const [post, setPost] = useState<Post | null>(null)
     const [navigating, setNavigating] = useState(false);
     const [markingResolved, setMarkingResolved] = useState(false);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
+    const [showCaptcha, setShowCaptcha] = useState(false);
+    const [captchaChecked, setCaptchaChecked] = useState(false);
+    const [reporting, setReporting] = useState(false);
     const router = useRouter();
     useEffect(() => {
         const fetchPost = async () => {
@@ -150,6 +156,11 @@ export default function PostDetail() {
                             {post.status === "lost" ? "Perdido" : "Encontrado"}
                         </Badge>
                     </CardTitle>
+                    {post.contact_hidden && (
+                        <div className="">
+
+                        </div>
+                    )}
                 </CardHeader>
                 {/* Cinta visual si está resuelto */}
                 {post.resolved && (
@@ -157,7 +168,18 @@ export default function PostDetail() {
                         Este amigo fiel encontró a su familia
                     </div>
                 )}
-                <CardContent className="space-y-4">
+                {/* Cartel de revisión */}
+                {post.contact_hidden && (
+                    <div className="absolute inset-0 z-30 flex flex-col items-center justify-center w-full h-full pointer-events-none">
+                        <div className="bg-yellow-200 bg-opacity-80 rounded-lg px-8 py-6 text-center shadow-xl">
+                            <span className="text-yellow-800 font-bold text-xl text-center px-4">
+                                Esta publicación está en revisión por la comunidad.<br />
+                                El contacto se ha ocultado temporalmente.
+                            </span>
+                        </div>
+                    </div>
+                )}
+                <CardContent className={`space-y-4 ${post.contact_hidden ? 'blur-sm grayscale opacity-80 pointer-events-none' : ''}`}>
                     {post.image_url && (
                         <img
                             src={post.image_url}
@@ -187,8 +209,8 @@ export default function PostDetail() {
                         )}
                     </div>
 
-                    {/* 🔹 Botón de contacto destacado */}
-                    {post.contact_type && post.contact_value && !post.resolved && (
+                    {/* 🔹 Botón de contacto destacado u oculto por reportes */}
+                    {post.contact_type && post.contact_value && !post.resolved && !post.contact_hidden && (
                         <div className="pt-4">
                             <ContactButton type={post.contact_type} value={post.contact_value} />
                         </div>
@@ -199,6 +221,60 @@ export default function PostDetail() {
                             <div className="bg-gray-200 text-gray-500 rounded-lg p-4 text-center font-semibold">
                                 El contacto fue bloqueado porque la mascota ya fue encontrada.
                             </div>
+                        </div>
+                    )}
+                    {/* Botón Reportar */}
+                    {!post.resolved && !post.contact_hidden && (
+                        <div className="pt-4">
+                            <Button
+                                variant="outline"
+                                className="bg-red-100 text-red-700 hover:bg-red-200 rounded-xl px-4 py-2 shadow-md"
+                                onClick={() => setShowCaptcha(true)}
+                                disabled={reporting}
+                            >
+                                Reportar
+                            </Button>
+                        </div>
+                    )}
+                    {/* Mini captcha y lógica de reporte */}
+                    {showCaptcha && (
+                        <div className="pt-4 flex flex-col items-center gap-2">
+                            <label className="flex items-center gap-2">
+                                <input type="checkbox" checked={captchaChecked} onChange={e => setCaptchaChecked(e.target.checked)} />
+                                No soy un robot
+                            </label>
+                            <Button
+                                onClick={async () => {
+                                    if (!post) return;
+                                    setReporting(true);
+                                    const newCount = (post.reports_count || 0) + 1;
+                                    const { error } = await supabase
+                                        .from("posts")
+                                        .update({
+                                            reports_count: newCount,
+                                            contact_hidden: newCount >= REPORT_THRESHOLD
+                                        })
+                                        .eq("id", post.id);
+                                    if (!error) {
+                                        setSuccessMsg("¡Reporte enviado! Gracias por ayudar a la comunidad.");
+                                        setShowCaptcha(false);
+                                        setCaptchaChecked(false);
+                                        // Refresca el post
+                                        const { data } = await supabase.from("posts").select("*").eq("id", post.id).single();
+                                        setPost(data as Post);
+                                    } else {
+                                        setSuccessMsg("Error al reportar. Intenta de nuevo.");
+                                    }
+                                    setReporting(false);
+                                }}
+                                disabled={!captchaChecked || reporting}
+                                className="bg-red-600 text-white hover:bg-red-700 rounded-xl px-4 py-2 shadow-md"
+                            >
+                                Enviar reporte
+                            </Button>
+                            <Button variant="ghost" onClick={() => { setShowCaptcha(false); setCaptchaChecked(false); }}>
+                                Cancelar
+                            </Button>
                         </div>
                     )}
                     {/* Botón marcar como resuelto */}
