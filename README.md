@@ -23,6 +23,7 @@ La app busca conectar rápidamente a quienes perdieron o encontraron una mascota
 -   IA: Asistencia de GitHub Copilot y ChatGPT en generación de código y documentación
 
 ---
+
 🤖 **Créditos / Uso de IA**
 - Asistencia en generación de código, documentación y debugging: ChatGPT (OpenAI), Gemini (Google) Copilot (GitHub).
 - Inspiración visual: componentes de shadcn/ui
@@ -31,13 +32,13 @@ La app busca conectar rápidamente a quienes perdieron o encontraron una mascota
 ---
 📦 Funcionalidades principales
 
-✅ Publicar aviso de animal perdido/encontrado con foto, especie, descripción, zona y contacto.
-✅ Buscar y filtrar pore specie y estado.
-✅ Marcar caso como Resuelto (oculta datos de contacto).
-✅ Botón Reportar con captcha y auto-ocultar tras varios reportes.
-✅ Botón Compartir (Web Share API / copiar link).
-✅ Disclaimer de seguridad y privacidad integrado.
-✅ Mobile-first, accesible y con imágenes optimizadas.
+*** ✅ Publicar aviso de animal perdido/encontrado con foto, especie, descripción, zona y contacto. ***
+*** ✅ Buscar y filtrar pore specie y estado. ***
+*** ✅ Marcar caso como Resuelto (oculta datos de contacto). ***
+*** ✅ Botón Reportar con captcha y auto-ocultar tras varios reportes. ***
+*** ✅ Botón Compartir (Web Share API / copiar link). ***
+*** ✅ Disclaimer de seguridad y privacidad integrado. ***
+*** ✅ Mobile-first, accesible y con imágenes optimizadas. ***
 ---
 🔒 Privacidad & Seguridad
 👉[Politicas de privacidad](https://hackathon-milagro.vercel.app/privacidad)
@@ -54,7 +55,7 @@ La app busca conectar rápidamente a quienes perdieron o encontraron una mascota
 
 📜 Licencia
 
-Este proyecto se publica bajo licencia MIT.
+Este proyecto se publica bajo licencia Apache 2.0 .
 Ver [archivo LICENSE](https://github.com/LucianoFlores1/hackathon-milagro/blob/main/LICENSE)
  para más detalles.
 
@@ -80,10 +81,10 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la 
 
 ---
 
-📦 **Arquitectura:**
+📦 **Arquitectura Simple:**
 
 -   Frontend: Next.js + Tailwind CSS
--   Backend: Supabase base de datos y almacenamiento
+-   Backend: Supabase (base de datos y almacenamiento)
 -   Deploy: Vercel
 -   Auth mínima: tokens de edición mediante cookies
 -   Sin cookies de seguimiento, solo localStorage para avisos y privacidad
@@ -95,11 +96,5 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la 
 
 ---
 
-🤖 **Créditos:**
-
--   Asistencia de GitHub Copilot y ChatGPT para generación de código y documentación
-   y Supabase
-
----
 
 ¡Gracias por visitar Amigo Fiel! 🐾
