@@ -305,13 +305,14 @@ export default function Home() {
         >{message}</p>
       )}
 
-      <Card className={`p-0 transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1300px]" : "max-h-15"} `}
+      <Card className={`p-0 transition-max-height duration-500 overflow-hidden ${showForm ? "max-h-[1300px]" : "max-h-15"} bg-blue-50 border border-blue-200 shadow-sm`}
       >
         <Button
           variant="outline"
           className="rounded-xl px-4 py-2 shadow-md 
              hover:shadow-lg hover:scale-[1.02] 
-             transition-all duration-300"
+             transition-all duration-300
+             "
           onClick={() => setShowForm(!showForm)}>
 
           {showForm ? "Ocultar formulario de publicación" : "➕ Publicar un aviso"}
