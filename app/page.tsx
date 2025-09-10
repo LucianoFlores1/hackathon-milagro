@@ -235,10 +235,9 @@ export default function Home() {
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
       {navigating && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
+        <div className="fixed inset-0 min-h-screen z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
           <div className="flex flex-col items-center">
             <Spinner />
-
           </div>
         </div>
       )}
