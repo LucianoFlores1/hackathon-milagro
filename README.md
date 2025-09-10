@@ -83,6 +83,38 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la 
 
 ---
 
+📂 Estructura de la tabla posts
+
+id (uuid, PK, autogen)
+
+status (text: "lost" o "found")
+
+species (text: "dog", "cat", etc.)
+
+title (text)
+
+description (text)
+
+zone_text (text, zona aproximada)
+
+contact_type (text: "email" / "phone")
+
+contact_value (text)
+
+event_date (date, default: CURRENT_DATE)
+
+created_at (timestamptz, default: now())
+
+resolved (bool, default: false)
+
+image_url (text, link a Supabase Storage)
+
+edit_token (text, generado al crear el post, guardado en cookie local para edición posterior)
+
+reports_count (int, default: 0)
+
+contact_hidden (bool, default: false)
+
 📦 **Arquitectura Simple:**
 
 -   Frontend: Next.js + Tailwind CSS
