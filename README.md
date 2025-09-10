@@ -1,10 +1,14 @@
-# Mascotas del Milagro
+# 🐶🐱 Hackathon del Milagro – "Amigo Fiel"
 
-Plataforma colaborativa para publicar y encontrar mascotas perdidas o encontradas en la comunidad. Permite crear avisos, compartirlos, reportar publicaciones y coordinar encuentros de forma segura.
+Plataforma colaborativa para publicar y encontrar mascotas perdidas durante la Procesión del Milagro en Salta. 
+Permite crear avisos, compartirlos, reportar publicaciones y coordinar encuentros.
 
+La app busca conectar rápidamente a quienes perdieron o encontraron una mascota, de forma simple, segura y accesible.
 ---
 
-🌐 **Deploy:** [Pon aquí el link a tu deploy en Vercel/Netlify]
+🚀 Demo pública
+
+👉 [Demo en producción](https://hackathon-milagro.vercel.app/)
 
 ---
 
