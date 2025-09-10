@@ -12,6 +12,7 @@ import { Phone, Mail, MessageCircle, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { Spinner } from "@/components/ui/Spinner";
 import { PostSkeleton } from "@/components/ui/PostSkeleton"
+import ShareButton from "@/components/ui/ShareButton"
 
 type Post = {
     id: string
@@ -156,6 +157,9 @@ export default function PostDetail() {
                             {post.status === "lost" ? "Perdido" : "Encontrado"}
                         </Badge>
                     </CardTitle>
+                    <div className="mt-2">
+                        <ShareButton postId={post.id} postTitle={post.title} />
+                    </div>
                     {post.contact_hidden && (
                         <div className="">
 
@@ -238,43 +242,47 @@ export default function PostDetail() {
                     )}
                     {/* Mini captcha y lógica de reporte */}
                     {showCaptcha && (
-                        <div className="pt-4 flex flex-col items-center gap-2">
-                            <label className="flex items-center gap-2">
-                                <input type="checkbox" checked={captchaChecked} onChange={e => setCaptchaChecked(e.target.checked)} />
-                                No soy un robot
-                            </label>
-                            <Button
-                                onClick={async () => {
-                                    if (!post) return;
-                                    setReporting(true);
-                                    const newCount = (post.reports_count || 0) + 1;
-                                    const { error } = await supabase
-                                        .from("posts")
-                                        .update({
-                                            reports_count: newCount,
-                                            contact_hidden: newCount >= REPORT_THRESHOLD
-                                        })
-                                        .eq("id", post.id);
-                                    if (!error) {
-                                        setSuccessMsg("¡Reporte enviado! Gracias por ayudar a la comunidad.");
-                                        setShowCaptcha(false);
-                                        setCaptchaChecked(false);
-                                        // Refresca el post
-                                        const { data } = await supabase.from("posts").select("*").eq("id", post.id).single();
-                                        setPost(data as Post);
-                                    } else {
-                                        setSuccessMsg("Error al reportar. Intenta de nuevo.");
-                                    }
-                                    setReporting(false);
-                                }}
-                                disabled={!captchaChecked || reporting}
-                                className="bg-red-600 text-white hover:bg-red-700 rounded-xl px-4 py-2 shadow-md"
-                            >
-                                Enviar reporte
-                            </Button>
-                            <Button variant="ghost" onClick={() => { setShowCaptcha(false); setCaptchaChecked(false); }}>
-                                Cancelar
-                            </Button>
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+                            <div className="bg-white rounded-xl shadow-2xl px-8 py-6 flex flex-col items-center gap-4 min-w-[320px] max-w-[90vw]">
+                                <label className="flex items-center gap-2 text-lg font-medium">
+                                    <input type="checkbox" checked={captchaChecked} onChange={e => setCaptchaChecked(e.target.checked)} />
+                                    No soy un robot
+                                </label>
+                                <div className="flex gap-2 w-full justify-center">
+                                    <Button
+                                        onClick={async () => {
+                                            if (!post) return;
+                                            setReporting(true);
+                                            const newCount = (post.reports_count || 0) + 1;
+                                            const { error } = await supabase
+                                                .from("posts")
+                                                .update({
+                                                    reports_count: newCount,
+                                                    contact_hidden: newCount >= REPORT_THRESHOLD
+                                                })
+                                                .eq("id", post.id);
+                                            if (!error) {
+                                                setSuccessMsg("¡Reporte enviado! Gracias por ayudar a la comunidad.");
+                                                setShowCaptcha(false);
+                                                setCaptchaChecked(false);
+                                                // Refresca el post
+                                                const { data } = await supabase.from("posts").select("*").eq("id", post.id).single();
+                                                setPost(data as Post);
+                                            } else {
+                                                setSuccessMsg("Error al reportar. Intenta de nuevo.");
+                                            }
+                                            setReporting(false);
+                                        }}
+                                        disabled={!captchaChecked || reporting}
+                                        className="bg-red-600 text-white hover:bg-red-700 rounded-xl px-4 py-2 shadow-md"
+                                    >
+                                        Enviar reporte
+                                    </Button>
+                                    <Button variant="ghost" onClick={() => { setShowCaptcha(false); setCaptchaChecked(false); }}>
+                                        Cancelar
+                                    </Button>
+                                </div>
+                            </div>
                         </div>
                     )}
                     {/* Botón marcar como resuelto */}
