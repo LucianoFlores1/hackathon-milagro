@@ -23,6 +23,8 @@ type Post = {
     contact_type: string
     contact_value: string
     image_url: string | null
+    resolved?: boolean
+    edit_token?: string
 }
 
 function ContactButton({ type, value }: { type: string; value: string }) {
@@ -65,17 +67,38 @@ export default function PostDetail() {
     const params = useParams()
     const [post, setPost] = useState<Post | null>(null)
     const [navigating, setNavigating] = useState(false);
+    const [markingResolved, setMarkingResolved] = useState(false);
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const router = useRouter();
     useEffect(() => {
         const fetchPost = async () => {
-            const { data } = await supabase.from("posts").select("*").eq("id", params.id).single()
-            setPost(data as Post)
+            const { data } = await supabase.from("posts").select("*").eq("id", params.id).single();
+            setPost(data as Post);
+        };
+        fetchPost();
+    }, [params.id]);
+
+    // Verifica si el usuario tiene el token correcto en localStorage
+    const canMarkResolved = post && post.edit_token && localStorage.getItem(`edit_token_${post.id}`) === post.edit_token && !post.resolved;
+
+    const handleMarkResolved = async () => {
+        if (!post) return;
+        setMarkingResolved(true);
+        const { error } = await supabase.from("posts").update({ resolved: true }).eq("id", post.id);
+        if (!error) {
+            setSuccessMsg("¡El post fue marcado como resuelto!");
+            setPost({ ...post, resolved: true });
         }
-        fetchPost()
-    }, [params.id])
+        setMarkingResolved(false);
+    };
 
     if (!post) return (
         <div className="p-6 space-y-6 max-w-2xl mx-auto relative">
+            {successMsg && (
+                <div className="mb-4 p-4 rounded-lg bg-green-100 text-green-700 text-center font-semibold">
+                    {successMsg}
+                </div>
+            )}
             <div className="flex items-center justify-center min-h-[300px]">
                 <PostSkeleton />
             </div>
@@ -100,7 +123,7 @@ export default function PostDetail() {
                 </Button>
             </Link>
 
-            <Card>
+            <Card className="relative overflow-hidden">
                 <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                         {post.title}
@@ -112,6 +135,12 @@ export default function PostDetail() {
                         </Badge>
                     </CardTitle>
                 </CardHeader>
+                {/* Cinta visual si está resuelto */}
+                {post.resolved && (
+                    <div className="absolute top-8 left-[-60px] rotate-[-20deg] w-[300px] bg-green-600 text-white text-center py-2 font-bold shadow-lg z-20">
+                        Este amigo fiel encontró a su familia
+                    </div>
+                )}
                 <CardContent className="space-y-4">
                     {post.image_url && (
                         <img
@@ -143,9 +172,29 @@ export default function PostDetail() {
                     </div>
 
                     {/* 🔹 Botón de contacto destacado */}
-                    {post.contact_type && post.contact_value && (
+                    {post.contact_type && post.contact_value && !post.resolved && (
                         <div className="pt-4">
                             <ContactButton type={post.contact_type} value={post.contact_value} />
+                        </div>
+                    )}
+                    {/* Si está resuelto, contacto bloqueado visualmente */}
+                    {post.resolved && (
+                        <div className="pt-4">
+                            <div className="bg-gray-200 text-gray-500 rounded-lg p-4 text-center font-semibold">
+                                El contacto fue bloqueado porque la mascota ya fue encontrada.
+                            </div>
+                        </div>
+                    )}
+                    {/* Botón marcar como resuelto */}
+                    {canMarkResolved && (
+                        <div className="pt-4">
+                            <Button
+                                onClick={handleMarkResolved}
+                                disabled={markingResolved}
+                                className="bg-green-600 text-white hover:bg-green-700 rounded-xl px-4 py-2 shadow-md"
+                            >
+                                {markingResolved ? "Marcando..." : "Marcar como resuelto"}
+                            </Button>
                         </div>
                     )}
                 </CardContent>
