@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
+// import { markAsResolved } from "@/components/ui/PostCard"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dog, Cat, PawPrint, MapPin, Calendar } from "lucide-react"
@@ -84,10 +85,25 @@ export default function PostDetail() {
     const handleMarkResolved = async () => {
         if (!post) return;
         setMarkingResolved(true);
-        const { error } = await supabase.from("posts").update({ resolved: true }).eq("id", post.id);
-        if (!error) {
+        const token = localStorage.getItem(`edit_token_${post.id}`);
+        const { error } = await supabase
+            .from("posts")
+            .update({ resolved: true, contact_value: "" })
+            .eq("id", post.id)
+            .eq("edit_token", token);
+        if (error) {
+            setSuccessMsg("No se pudo marcar como resuelto. Verifica el token o la conexión.");
+            console.error("Error al marcar como resuelto:", error);
+        } else {
             setSuccessMsg("¡El post fue marcado como resuelto!");
-            setPost({ ...post, resolved: true });
+            // Refresca el post desde la base de datos para asegurar el estado visual
+            const { data, error: fetchError } = await supabase.from("posts").select("*").eq("id", post.id).single();
+            if (fetchError) {
+                setSuccessMsg("Marcado, pero no se pudo refrescar el post.");
+                console.error("Error refrescando post:", fetchError);
+            } else {
+                setPost(data as Post);
+            }
         }
         setMarkingResolved(false);
     };

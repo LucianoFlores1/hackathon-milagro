@@ -15,6 +15,7 @@ export type Post = {
     contact_value: string;
     created_at: string;
     image_url: string | null;
+    resolved?: boolean;
 };
 
 export function formatRelativeDate(dateString: string): string {
@@ -33,14 +34,48 @@ export function formatRelativeDate(dateString: string): string {
     return date.toLocaleDateString();
 }
 
+
 interface PostCardProps {
     post: Post;
     href?: string;
 }
 
+// Ejemplo de función para marcar como resuelto usando fetch y header x-edit-token
+export async function markAsResolved(postId: string) {
+    const token = localStorage.getItem(`edit_token_${postId}`);
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/posts?id=eq.${postId}`, {
+            method: "PATCH",
+            headers: {
+                "apikey": process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
+                "Content-Type": "application/json",
+                "x-edit-token": token || "",
+            },
+            body: JSON.stringify({ resolved: true, contact_value: "" }),
+        });
+        if (response.status === 204) return {};
+        const result = await response.json();
+        if (!response.ok) {
+            console.error("Error al marcar como resuelto:", result);
+            throw new Error(result?.message || "Error desconocido");
+        }
+        return result;
+    } catch (e) {
+        console.error("Excepción en markAsResolved:", e);
+        throw e;
+    }
+}
+
 const PostCard = ({ post, href }: PostCardProps) => {
     const cardContent = (
-        <Card className="transform transition-all duration-500 ease-out hover:scale-105 hover:shadow-xl animate-fadeIn">
+        <Card className="transform transition-all duration-500 ease-out hover:scale-105 hover:shadow-xl animate-fadeIn relative overflow-hidden">
+            {/* Cinta verde si está resuelto */}
+            {post.resolved && (
+                <div className="absolute top-8 left-[-60px] rotate-[-20deg] w-[300px] bg-green-600 text-white text-center py-2 font-bold shadow-lg z-20">
+                    Esta mascota encontró a su familia
+                </div>
+            )}
             <div>
                 <CardHeader>
                     <CardTitle className="flex items-center justify-between">
@@ -80,7 +115,8 @@ const PostCard = ({ post, href }: PostCardProps) => {
                     </div>
                 </CardContent>
             </div>
-            {(post.contact_type || post.contact_value) && (
+            {/* Contacto solo si no está resuelto */}
+            {(!post.resolved && (post.contact_type || post.contact_value)) && (
                 <CardContent>
                     <div className="flex items-center space-x-2 text-sm text-gray-600 mt-2">
                         {post.contact_type === "whatsapp" ? <MessageCircle size={16} /> : <Mail size={16} />}
