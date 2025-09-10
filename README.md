@@ -85,36 +85,48 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la 
 
 📂 Estructura de la tabla posts
 
-id (uuid, PK, autogen)
+- id (uuid, PK, autogen)
 
-status (text: "lost" o "found")
+- status (text: "lost" o "found")
 
-species (text: "dog", "cat", etc.)
+- species (text: "dog", "cat", etc.)
 
-title (text)
+- title (text)
 
-description (text)
+- description (text)
 
-zone_text (text, zona aproximada)
+- zone_text (text, zona aproximada)
 
-contact_type (text: "email" / "phone")
+- contact_type (text: "email" / "phone")
 
-contact_value (text)
+- contact_value (text)
 
-event_date (date, default: CURRENT_DATE)
+- event_date (date, default: CURRENT_DATE)
 
-created_at (timestamptz, default: now())
+- created_at (timestamptz, default: now())
 
-resolved (bool, default: false)
+- resolved (bool, default: false)
 
-image_url (text, link a Supabase Storage)
+- image_url (text, link a Supabase Storage)
 
-edit_token (text, generado al crear el post, guardado en cookie local para edición posterior)
+- edit_token (text, generado al crear el post, guardado en cookie local para edición posterior)
 
-reports_count (int, default: 0)
+- reports_count (int, default: 0)
 
-contact_hidden (bool, default: false)
+- contact_hidden (bool, default: false)
 
+---
+🔐 Políticas activas (RLS)
+| Policy name                             | Acción | Descripción                                                                                            |
+| --------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------ |
+| **Public can read posts**               | SELECT | Permite a cualquier usuario leer todos los posts.                                                      |
+| **Allow public read**                   | SELECT | (Duplicada) También permite lectura pública sin restricciones.                                         |
+| **Public can insert specific fields**   | INSERT | Permite a cualquier usuario crear posts **solo si** `status ∈ {lost, found}` y `species ∈ {dog, cat}`. |
+| **Allow public insert**                 | INSERT | (Duplicada) Permite inserción pública sin restricciones.                                               |
+| **Allow update if edit\_token matches** | UPDATE | Permite actualizar un post únicamente si coincide el `edit_token`.                                     |
+| **Allow update reports**                | UPDATE | Permite incrementar `reports_count` en los posts (usado para botón "Reportar").                        |
+
+---
 📦 **Arquitectura Simple:**
 
 -   Frontend: Next.js + Tailwind CSS
