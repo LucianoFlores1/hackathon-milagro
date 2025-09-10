@@ -22,6 +22,7 @@ import PostCard from "@/components/ui/PostCard"
 import Alert from "@/components/ui/Alert"
 import { PostSkeleton } from "@/components/ui/PostSkeleton"
 import { useRouter } from "next/navigation";
+import { span } from "framer-motion/client"
 
 type Post = {
   id: string
@@ -79,6 +80,7 @@ export default function Home() {
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [navigating, setNavigating] = useState(false);
   const router = useRouter();
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
 
   // posts filtrados en memoria
   const filteredPosts = posts.filter((post) => {
@@ -133,19 +135,16 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    // 🔎 Validaciones simples
-    if (!title.trim() || !description.trim()) {
-      setAlert({ type: "error", message: "El título y la descripción son obligatorios." })
-      return
-    }
-    if (!contactValue.trim()) {
-      setAlert({ type: "error", message: "Debes ingresar un valor de contacto." })
-      return
-    }
-    if (eventDate && new Date(eventDate) > new Date()) {
-      setAlert({ type: "error", message: "La fecha no puede ser futura." })
-      return
+    // Validaciones
+    const errors: { [key: string]: string } = {};
+    if (!title.trim()) errors.title = "El título es obligatorio.";
+    if (!description.trim()) errors.description = "La descripción es obligatoria.";
+    if (!contactValue.trim()) errors.contactValue = "El contacto es obligatorio.";
+    if (eventDate && new Date(eventDate) > new Date()) errors.eventDate = "La fecha no puede ser futura.";
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setAlert({ type: "error", message: "Por favor corrige los errores marcados." });
+      return;
     }
 
     setLoading(true);
@@ -290,9 +289,12 @@ export default function Home() {
             <form id="create-post" onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Título</Label>
-                  <Input className="rounded-lg border-gray-300 focus:border-blue-500 
-             focus:ring focus:ring-blue-200 transition duration-200" id="title" placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
+                  <Label htmlFor="title">Título <span className="text-red-500" aria-label="obligatorio">*</span>
+                  </Label>
+                  <Input className={fieldErrors.title ? "border-red-500 focus:border-red-500" : ""} id="title" placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} aria-invalid={!!fieldErrors.title} aria-describedby={fieldErrors.title ? "title-error" : undefined} />
+                  {fieldErrors.title && (
+                    <span id="error-title" className="text-xs text-red-600" role="alert">{fieldErrors.title}</span>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="image">Foto</Label>
@@ -332,8 +334,16 @@ export default function Home() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Descripción</Label>
-                <Textarea id="description" placeholder="Descripción detallada de tu mascota..." value={description} onChange={(e) => setDescription(e.target.value)} />
+                <Label htmlFor="description">Descripción <span className="text-red-500" aria-label="obligatorio">*</span></Label>
+                <Textarea id="description" placeholder="Descripción detallada de tu mascota..." value={description} onChange={(e) => setDescription(e.target.value)} aria-invalid={!!fieldErrors.description}
+                  aria-describedby={fieldErrors.description ? "error-description" : undefined}
+                  className={fieldErrors.description ? "border-red-500 focus:border-red-500" : ""}
+                />
+                {fieldErrors.description && (
+                  <span id="error-description" className="text-xs text-red-600" role="alert">
+                    {fieldErrors.description}
+                  </span>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -344,8 +354,19 @@ export default function Home() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="event-date">Fecha del hecho</Label>
-                  <Input id="event-date" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="rounded-lg border-gray-300 focus:border-blue-500 
-             focus:ring focus:ring-blue-200 transition duration-200" />
+                  <Input id="event-date"
+                    type="date"
+                    value={eventDate}
+                    onChange={(e) => setEventDate(e.target.value)}
+                    aria-invalid={!!fieldErrors.eventDate}
+                    aria-describedby={fieldErrors.eventDate ? "error-event-date" : undefined}
+                    className={fieldErrors.eventDate ? "border-red-500 focus:border-red-500" : "rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200"}
+                  />
+                  {fieldErrors.eventDate && (
+                    <span id="error-event-date" className="text-xs text-red-600" role="alert">
+                      {fieldErrors.eventDate}
+                    </span>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="contact-type">Tipo de contacto</Label>
@@ -361,8 +382,15 @@ export default function Home() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="contact-value">Valor de contacto</Label>
-                <Input id="contact-value" placeholder="Ej: 3811234567 o email@ejemplo.com" value={contactValue} onChange={(e) => setContactValue(e.target.value)} className="rounded-lg border-gray-300 focus:border-blue-500 
-             focus:ring focus:ring-blue-200 transition duration-200"/>
+                <Input id="contact-value" placeholder="Ej: 3811234567 o email@ejemplo.com" value={contactValue} onChange={(e) => setContactValue(e.target.value)} aria-invalid={!!fieldErrors.contactValue}
+                  aria-describedby={fieldErrors.contactValue ? "error-contact-value" : undefined}
+                  className={fieldErrors.contactValue ? "border-red-500 focus:border-red-500" : "rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200"}
+                />
+                {fieldErrors.contactValue && (
+                  <span id="error-contact-value" className="text-xs text-red-600" role="alert">
+                    {fieldErrors.contactValue}
+                  </span>
+                )}
               </div>
               <Button type="submit" disabled={loading} className="rounded-xl px-4 py-2 shadow-md 
              hover:shadow-lg hover:scale-[1.02] 
