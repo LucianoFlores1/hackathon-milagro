@@ -32,13 +32,13 @@ La app busca conectar rápidamente a quienes perdieron o encontraron una mascota
 ---
 📦 Funcionalidades principales
 
-✅ *** Publicar aviso de animal perdido/encontrado con foto, especie, descripción, zona y contacto. ***
-***✅*** Buscar y filtrar pore specie y estado. 
-***✅*** Marcar caso como Resuelto (oculta datos de contacto). 
-***✅*** Botón Reportar con captcha y auto-ocultar tras varios reportes.
-***✅*** Botón Compartir (Web Share API / copiar link). 
-***✅*** Disclaimer de seguridad y privacidad integrado. 
-***✅*** Mobile-first, accesible y con imágenes optimizadas. 
+Publicar aviso de animal perdido/encontrado con foto, especie, descripción, zona y contacto. ***
+Buscar y filtrar pore specie y estado. 
+Marcar caso como Resuelto (oculta datos de contacto). 
+Botón Reportar con captcha y auto-ocultar tras varios reportes.
+Botón Compartir (Web Share API / copiar link). 
+Disclaimer de seguridad y privacidad integrado. 
+ Mobile-first, accesible y con imágenes optimizadas. 
 ---
 🔒 Privacidad & Seguridad
 👉[Politicas de privacidad](https://hackathon-milagro.vercel.app/privacidad)
