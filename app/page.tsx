@@ -59,6 +59,47 @@ const formatRelativeDate = (dateString: string): string => {
 };
 
 export default function Home() {
+  const [showPrivacyNotice, setShowPrivacyNotice] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const accepted = localStorage.getItem("privacyAccepted");
+      if (!accepted) setShowPrivacyNotice(true);
+    }
+  }, []);
+  // ...existing code...
+  {
+    showPrivacyNotice && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+        <div className="bg-white rounded-xl shadow-2xl px-8 py-6 max-w-md w-full mx-4">
+          <h1 className="text-xl font-bold mb-4">Política de Privacidad</h1>
+          <p className="mb-2">
+            Esta plataforma es colaborativa y gratuita. Los datos publicados en los avisos son responsabilidad exclusiva de cada usuario.
+          </p>
+          <ul className="list-disc pl-6 mt-2 space-y-1">
+            <li>No publicamos ni compartimos información sensible (direcciones exactas, documentos, teléfonos de menores).</li>
+            <li>Las zonas indicadas deben ser aproximadas para proteger la privacidad.</li>
+            <li>Se recomienda coordinar encuentros en lugares públicos y seguros.</li>
+            <li>Las fotos deben ser propias o contar con permiso.</li>
+            <li>No utilizamos cookies para seguimiento ni recopilamos datos personales con fines comerciales.</li>
+          </ul>
+          <div className="flex justify-end mt-6">
+            <button
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  localStorage.setItem("privacyAccepted", "true");
+                }
+                setShowPrivacyNotice(false);
+              }}
+              className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-blue-700"
+            >
+              Aceptar y continuar
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdPostId, setCreatedPostId] = useState<string | null>(null);
@@ -241,6 +282,37 @@ export default function Home() {
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
+      {/* Modal de privacidad al primer ingreso */}
+      {showPrivacyNotice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-grey bg-opacity-40 backdrop-blur-sm h-screen">
+          <div className="bg-white rounded-xl shadow-2xl px-8 py-6 max-w-md w-full mx-4">
+            <h1 className="text-xl font-bold mb-4">Política de Privacidad</h1>
+            <p className="mb-2">
+              Esta plataforma es colaborativa y gratuita. Los datos publicados en los avisos son responsabilidad exclusiva de cada usuario.
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1">
+              <li>No publicamos ni compartimos información sensible (direcciones exactas, documentos, teléfonos de menores).</li>
+              <li>Las zonas indicadas deben ser aproximadas para proteger la privacidad.</li>
+              <li>Se recomienda coordinar encuentros en lugares públicos y seguros.</li>
+              <li>Las fotos deben ser propias o contar con permiso.</li>
+              <li>No utilizamos cookies para seguimiento ni recopilamos datos personales con fines comerciales.</li>
+            </ul>
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("privacyAccepted", "true");
+                  }
+                  setShowPrivacyNotice(false);
+                }}
+                className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-blue-700"
+              >
+                Aceptar y continuar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Modal de éxito al crear post */}
       {showSuccessModal && (
         <div className="fixed inset-0 min-h-screen z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
@@ -295,6 +367,13 @@ export default function Home() {
           </nav>
         </div>
       </header>
+      {/* Disclaimer de seguridad */}
+      <div className="w-full max-w-4xl mx-auto mt-2 mb-4">
+        <div className="flex items-center gap-2 bg-yellow-100 border border-yellow-300 text-yellow-900 rounded-lg px-4 py-2 text-sm font-medium shadow">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-700" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 1 1 2 10a8 8 0 0 1 16 0zm-8.75-3a.75.75 0 0 1 1.5 0v3.25a.75.75 0 0 1-1.5 0V7zm.75 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" clipRule="evenodd" /></svg>
+          Esta plataforma es colaborativa; se recomienda coordinar encuentros en lugares públicos y seguros.
+        </div>
+      </div>
       {alert && (
         <Alert
           type={alert.type}
@@ -302,7 +381,6 @@ export default function Home() {
           onClose={() => setAlert(null)}
         />
       )}
-      <h1 className="text-3xl font-bold text-center">Mascotas Perdidas y Encontradas</h1>
 
       {message && (
         <p
@@ -465,6 +543,7 @@ export default function Home() {
           </div>
         )}
       </Card>
+      <h1 className="text-3xl font-bold text-center">Mascotas Perdidas y Encontradas</h1>
 
       {/* Tarjeta de búsqueda y filtros mejorada */}
       <Card className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-blue-50 via-white to-blue-100 border border-blue-200">
