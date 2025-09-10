@@ -155,33 +155,33 @@ export default function Home() {
 
     let imageUrl = null;
 
-    if (imageFile) {
-      const fileName = `${Date.now()}-${imageFile.name}`
-      const filePath = `images/${fileName}` // usamos este
+    // 1. Generar token único
+    const editToken = crypto.randomUUID();
 
+    if (imageFile) {
+      const fileName = `${Date.now()}-${imageFile.name}`;
+      const filePath = `images/${fileName}`;
       const { error: uploadError } = await supabase.storage
         .from("post-images")
         .upload(filePath, imageFile, {
           cacheControl: "3600",
           upsert: false,
-        })
-
+        });
       if (uploadError) {
-        console.error("Error en upload:", uploadError.message)
-        setAlert({ type: "error", message: "Error al subir la imagen. Intenta de nuevo." })
-        setLoading(false)
-        return
+        console.error("Error en upload:", uploadError.message);
+        setAlert({ type: "error", message: "Error al subir la imagen. Intenta de nuevo." });
+        setLoading(false);
+        return;
       }
-
       // Obtener la URL pública de la imagen
       const { data } = supabase.storage
         .from("post-images")
-        .getPublicUrl(filePath)
-
+        .getPublicUrl(filePath);
       if (data?.publicUrl) {
-        imageUrl = data.publicUrl
+        imageUrl = data.publicUrl;
       }
     }
+    // 2. Guardar el token en la base junto al post
     const { data: insertData, error } = await supabase.from("posts").insert({
       title,
       description,
@@ -192,12 +192,17 @@ export default function Home() {
       contact_type: contactType,
       contact_value: contactValue,
       image_url: imageUrl,
+      resolved: false,
+      edit_token: editToken,
     }).select();
     if (error) {
-      setAlert({ type: "error", message: "Error al crear el post. Intenta de nuevo." })
+      setAlert({ type: "error", message: "Error al crear el post. Intenta de nuevo." });
     } else {
-      // Obtener el id del post recién creado
+      // 3. Guardar el token en localStorage para futuras ediciones
       const newId = insertData?.[0]?.id;
+      if (newId) {
+        localStorage.setItem(`edit_token_${newId}`, editToken);
+      }
       setCreatedPostId(newId || null);
       setShowSuccessModal(true);
       setTitle("");
