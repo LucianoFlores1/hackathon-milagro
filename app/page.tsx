@@ -60,6 +60,8 @@ const formatRelativeDate = (dateString: string): string => {
 
 export default function Home() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdPostId, setCreatedPostId] = useState<string | null>(null);
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [status, setStatus] = useState("lost")
@@ -180,48 +182,48 @@ export default function Home() {
         imageUrl = data.publicUrl
       }
     }
-    const { error } = await supabase.from("posts").insert({
+    const { data: insertData, error } = await supabase.from("posts").insert({
       title,
       description,
       status,
       species,
-      zone_text: zoneText, // Agregado
-      event_date: eventDate, // Agregado
-      contact_type: contactType, // Agregado
-      contact_value: contactValue, // Agregado
-      image_url: imageUrl, // 👈 nueva columna
-    })
+      zone_text: zoneText,
+      event_date: eventDate,
+      contact_type: contactType,
+      contact_value: contactValue,
+      image_url: imageUrl,
+    }).select();
     if (error) {
       setAlert({ type: "error", message: "Error al crear el post. Intenta de nuevo." })
     } else {
-      setAlert({ type: "success", message: "Post creado exitosamente." })
-      setTitle("")
-      setDescription("")
-      setStatus("lost")
-      setSpecies("dog")
-      setZoneText("") // Agregado
-      setEventDate("") // Agregado
-      setContactType("whatsapp") // Agregado
-      setContactValue("") // Agregado
-      setImageFile(null); // Limpiar el archivo de imagen
+      // Obtener el id del post recién creado
+      const newId = insertData?.[0]?.id;
+      setCreatedPostId(newId || null);
+      setShowSuccessModal(true);
+      setTitle("");
+      setDescription("");
+      setStatus("lost");
+      setSpecies("dog");
+      setZoneText("");
+      setEventDate("");
+      setContactType("whatsapp");
+      setContactValue("");
+      setImageFile(null);
       setPage(0);
 
       // Refresca los posts inmediatamente
-      // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-      setLoading(true)
-      const query = supabase.from("posts").select("*")
-      const start = 0
-      const end = PAGE_SIZE - 1
+      setLoading(true);
+      const query = supabase.from("posts").select("*");
+      const start = 0;
+      const end = PAGE_SIZE - 1;
       const { data, error: fetchError } = await query
         .order("created_at", { ascending: false })
-        .range(start, end)
+        .range(start, end);
       if (!fetchError && data) {
-        setPosts(data as Post[])
-        setHasMore(data.length === PAGE_SIZE)
-
+        setPosts(data as Post[]);
+        setHasMore(data.length === PAGE_SIZE);
       }
-      setLoading(false)
-      // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+      setLoading(false);
     }
     setLoading(false);
   }
@@ -234,6 +236,34 @@ export default function Home() {
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
+      {/* Modal de éxito al crear post */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 min-h-screen z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center max-w-sm mx-auto transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+            <div className="text-green-500 text-6xl mb-4">✅</div>
+            <h2 className="text-2xl font-bold mb-2 text-center">¡Publicación creada con éxito!</h2>
+            <p className="mb-6 text-center text-gray-700">Tu aviso se publicó correctamente.</p>
+            <Button
+              className="w-full mb-2"
+              onClick={() => {
+                if (createdPostId) {
+                  setShowSuccessModal(false);
+                  router.push(`/posts/${createdPostId}`);
+                }
+              }}
+            >
+              Ver mi publicación
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setShowSuccessModal(false)}
+            >
+              Cerrar
+            </Button>
+          </div>
+        </div>
+      )}
       {navigating && (
         <div className="fixed inset-0 min-h-screen z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
           <div className="flex flex-col items-center">
@@ -254,7 +284,9 @@ export default function Home() {
                   el.scrollIntoView({ behavior: "smooth" });
                 }
               }, 50);
-            }} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Publicar</button>
+            }} className="bg-blue-600 text-white w-full md:w-auto mt-2 md:mt-0 rounded-xl px-4 py-2 shadow-md 
+            hover:shadow-lg hover:scale-[1.02] 
+            transition-all duration-300">Publicar</button>
           </nav>
         </div>
       </header>
