@@ -32,7 +32,7 @@ La app busca conectar rápidamente a quienes perdieron o encontraron una mascota
 ---
 📦 Funcionalidades principales
 
-***✅Publicar aviso de animal perdido/encontrado con foto, especie, descripción, zona y contacto.***
+**✅Publicar aviso de animal perdido/encontrado con foto, especie, descripción, zona y contacto.**
 Buscar y filtrar pore specie y estado. 
 Marcar caso como Resuelto (oculta datos de contacto). 
 Botón Reportar con captcha y auto-ocultar tras varios reportes.
