@@ -74,6 +74,7 @@ cd hackathon-milagro
 npm install
 
 # Crear archivo .env.local con tus variables (ejemplo: Supabase URL y KEY)
+
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
 
@@ -97,39 +98,8 @@ create table posts (
   contact_hidden bool default false
 );
 
-# 📂 Crea la tabla 'post' con la siguiente estructura:
 
-# - id (uuid, PK, autogen)
-
-# - status (text: "lost" o "found")
-
-# - species (text: "dog", "cat", etc.)
-
-# - title (text)
-
-# - description (text)
-
-# - zone_text (text, zona aproximada)
-
-# - contact_type (text: "email" / "phone")
-
-# - contact_value (text)
-
-# - event_date (date, default: CURRENT_DATE)
-
-# - created_at (timestamptz, default: now())
-
-# - resolved (bool, default: false)
-
-# - image_url (text, link a Supabase Storage)
-
-# - edit_token (text, generado al crear el post, guardado en cookie local para edición posterior)
-
-# - reports_count (int, default: 0)
-
-# - contact_hidden (bool, default: false)
-
-# 5. Activar RLS y crear políticas
+# Activar RLS y crear políticas
 -- Activar Row Level Security
 alter table posts enable row level security;
 
@@ -168,7 +138,38 @@ npm run dev
 Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la app.
 
 ---
+🗄️ Estructura de la base de datos
+📂 Crea la tabla 'post' con la siguiente estructura:
 
+- id (uuid, PK, autogen)
+
+- status (text: "lost" o "found")
+
+- species (text: "dog", "cat", etc.)
+
+- title (text)
+
+- description (text)
+
+- zone_text (text, zona aproximada)
+
+- contact_type (text: "email" / "phone")
+
+- contact_value (text)
+
+- event_date (date, default: CURRENT_DATE)
+
+- created_at (timestamptz, default: now())
+
+- resolved (bool, default: false)
+
+- image_url (text, link a Supabase Storage)
+
+- edit_token (text, generado al crear el post, guardado en cookie local para edición posterior)
+
+- reports_count (int, default: 0)
+
+- contact_hidden (bool, default: false)
 ---
 🔐 Políticas activas (RLS)
 | Policy name                             | Acción | Descripción                                                                                            |
