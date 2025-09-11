@@ -350,7 +350,7 @@ export default function Home() {
       )}
       <header className="sticky top-0 z-50 bg-white shadow-md">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-blue-600">🐾 Mi Fiel Amigo</h1>
+          <h1 className="text-xl font-bold text-blue-600">🐾 Amigo Fiel</h1>
           <nav className="space-x-4">
             <Link href="/" className="text-gray-700 hover:text-blue-600">Inicio</Link>
             <button onClick={() => {
