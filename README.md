@@ -170,7 +170,9 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la 
 - reports_count (int, default: 0)
 
 - contact_hidden (bool, default: false)
----
+
+
+
 🔐 Políticas activas (RLS)
 | Policy name                             | Acción | Descripción                                                                                            |
 | --------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------ |
