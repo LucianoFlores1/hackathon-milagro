@@ -74,6 +74,92 @@ cd hackathon-milagro
 npm install
 
 # Crear archivo .env.local con tus variables (ejemplo: Supabase URL y KEY)
+NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
+
+# Configura la base de datos en Supabase:
+
+create table posts (
+  id uuid primary key default gen_random_uuid(),
+  status text default ''::text,
+  species text default ''::text,
+  title text,
+  description text,
+  zone_text text,
+  contact_type text,
+  contact_value text,
+  event_date date default current_date,
+  created_at timestamptz default now(),
+  resolved bool default false,
+  image_url text,
+  edit_token text,
+  reports_count int4 default 0,
+  contact_hidden bool default false
+);
+
+# 📂 Crea la tabla 'post' con la siguiente estructura:
+
+# - id (uuid, PK, autogen)
+
+# - status (text: "lost" o "found")
+
+# - species (text: "dog", "cat", etc.)
+
+# - title (text)
+
+# - description (text)
+
+# - zone_text (text, zona aproximada)
+
+# - contact_type (text: "email" / "phone")
+
+# - contact_value (text)
+
+# - event_date (date, default: CURRENT_DATE)
+
+# - created_at (timestamptz, default: now())
+
+# - resolved (bool, default: false)
+
+# - image_url (text, link a Supabase Storage)
+
+# - edit_token (text, generado al crear el post, guardado en cookie local para edición posterior)
+
+# - reports_count (int, default: 0)
+
+# - contact_hidden (bool, default: false)
+
+# 5. Activar RLS y crear políticas
+-- Activar Row Level Security
+alter table posts enable row level security;
+
+-- Políticas actuales
+create policy "Public can read posts" 
+  on posts for select 
+  using (true);
+
+create policy "Public can insert specific fields" 
+  on posts for insert
+  with check ((status = ANY (ARRAY['lost','found'])) AND (species = ANY (ARRAY['dog','cat'])));
+
+create policy "Allow public read" 
+  on posts for select 
+  using (true);
+
+create policy "Allow public insert" 
+  on posts for insert 
+  with check (true);
+
+create policy "Allow update if edit_token matches"
+  on posts for update
+  using (true)
+  with check (edit_token = edit_token);
+
+create policy "Allow update reports"
+  on posts for update
+  using (true)
+  with check (true);
+
 
 # Ejecuta el servidor de desarrollo
 npm run dev
@@ -82,38 +168,6 @@ npm run dev
 Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la app.
 
 ---
-
-📂 Estructura de la tabla posts
-
-- id (uuid, PK, autogen)
-
-- status (text: "lost" o "found")
-
-- species (text: "dog", "cat", etc.)
-
-- title (text)
-
-- description (text)
-
-- zone_text (text, zona aproximada)
-
-- contact_type (text: "email" / "phone")
-
-- contact_value (text)
-
-- event_date (date, default: CURRENT_DATE)
-
-- created_at (timestamptz, default: now())
-
-- resolved (bool, default: false)
-
-- image_url (text, link a Supabase Storage)
-
-- edit_token (text, generado al crear el post, guardado en cookie local para edición posterior)
-
-- reports_count (int, default: 0)
-
-- contact_hidden (bool, default: false)
 
 ---
 🔐 Políticas activas (RLS)
