@@ -350,7 +350,7 @@ export default function Home() {
       )}
       <header className="sticky top-0 z-50 bg-white shadow-md">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-blue-600">🐾 Amigo Fiel</h1>
+          <h1 className="text-xl font-bold text-blue-600">🐾 Mi Amigo Fiel</h1>
           <nav className="space-x-4">
             <Link href="/" className="text-gray-700 hover:text-blue-600">Inicio</Link>
             <button onClick={() => {
@@ -510,7 +510,6 @@ export default function Home() {
                     <SelectContent>
                       <SelectItem value="whatsapp">WhatsApp</SelectItem>
                       <SelectItem value="email">Email</SelectItem>
-                      <SelectItem value="form">Formulario</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -645,7 +644,7 @@ export default function Home() {
         </div>
       )}
       <footer className="mt-12 bg-gray-100 py-4 text-center text-sm text-gray-600">
-        © 2025 Milagro Pets – Hackathon del Milagro 🐶🐱
+        © 2025 Mascotas del Milagro – Mi Amigo Fiel 🐶🐱
       </footer>
 
     </div>
