@@ -131,7 +131,7 @@ const PostCard = ({ post, href }: PostCardProps) => {
                             </span>
                         </div>
                     )}
-                    <div>
+                    <div className="flex items-center gap-1 mt-2">
                         {post.contact_type === "whatsapp" ? <MessageCircle size={16} /> : <Mail size={16} />}
                         <span>
                             Contacto:
