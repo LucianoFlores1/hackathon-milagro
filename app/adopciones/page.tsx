@@ -1,8 +1,9 @@
 "use client";
 
-import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
-import AdoptionCard, { Adoption } from "@/components/ui/AdoptionCard";
+import { supabase } from "@/lib/supabase";
+import AdoptionCard from "@/components/ui/AdoptionCard";
+import { Adoption } from "@/types/adoption"; // <--- Importa el tipo aquí
 
 export default function AdopcionesPage() {
     const [adoptions, setAdoptions] = useState<Adoption[]>([]);
@@ -15,7 +16,7 @@ export default function AdopcionesPage() {
                 .select("*")
                 .order("created_at", { ascending: false });
 
-            if (!error && data) setAdoptions(data);
+            if (!error && data) setAdoptions(data as Adoption[]);
             setLoading(false);
         };
 
@@ -34,7 +35,6 @@ export default function AdopcionesPage() {
                     <AdoptionCard
                         key={adoption.id}
                         adoption={adoption}
-                    // onClick={() => router.push(`/adopciones/${adoption.id}`)} // Para navegación al detalle
                     />
                 ))}
             </div>

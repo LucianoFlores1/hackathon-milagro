@@ -2,20 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail } from "lucide-react";
 import Link from "next/link";
-
-export type Adoption = {
-    id: string;
-    name: string;
-    description: string;
-    status: string; // "available" | "adopted"
-    species: string;
-    zone_text: string;
-    created_at: string;
-    image_url: string | null;
-    contact_type?: string;
-    contact_value?: string;
-    contact_hidden?: boolean;
-};
+import { Adoption } from "@/types/adoption";
 
 interface AdoptionCardProps {
     adoption: Adoption;
