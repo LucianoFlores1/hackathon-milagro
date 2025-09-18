@@ -1,8 +1,8 @@
 "use client";
 
-import { supabase } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
-import PetDetailCard from "@/components/ui/PetDetailCard";
+import AdoptionCard from "@/components/ui/AdoptionCard";
 
 export default function AdopcionesPage() {
     const [adoptions, setAdoptions] = useState<any[]>([]);
@@ -30,15 +30,11 @@ export default function AdopcionesPage() {
                 <div className="text-gray-500">No hay perritos en adopción por ahora.</div>
             )}
             <div className="grid gap-6 md:grid-cols-2">
-                {adoptions.map((pet) => (
-                    <PetDetailCard
-                        key={pet.id}
-                        pet={{
-                            ...pet,
-                            title: pet.name || "Sin nombre",
-                            // Puedes mapear otros campos si tu componente espera otros nombres
-                        }}
-                        type="adopcion"
+                {adoptions.map((adoption) => (
+                    <AdoptionCard
+                        key={adoption.id}
+                        adoption={adoption}
+                    // onClick={() => router.push(`/adopciones/${adoption.id}`)} // Para navegación al detalle
                     />
                 ))}
             </div>
