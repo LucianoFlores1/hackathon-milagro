@@ -2,10 +2,10 @@
 
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
-import AdoptionCard from "@/components/ui/AdoptionCard";
+import AdoptionCard, { Adoption } from "@/components/ui/AdoptionCard";
 
 export default function AdopcionesPage() {
-    const [adoptions, setAdoptions] = useState<any[]>([]);
+    const [adoptions, setAdoptions] = useState<Adoption[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
