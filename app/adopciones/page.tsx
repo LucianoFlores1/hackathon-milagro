@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PostSkeleton } from "@/components/ui/PostSkeleton";
+import { Spinner } from "@/components/ui/Spinner";
 import {
     Select,
     SelectContent,
@@ -25,9 +27,14 @@ export default function AdopcionesPage() {
     const [filterStatus, setFilterStatus] = useState<string>("all"); // available | adopted | all
     const [filterSpecies, setFilterSpecies] = useState<string>("all"); // dog | cat | other | all
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const PAGE_SIZE = 9;
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
 
     useEffect(() => {
         fetchAdoptions();
+        // Reinicia a primera página cuando cambian filtros/búsqueda
+        setPage(0);
     }, [filterStatus, filterSpecies, searchTerm]);
 
     const fetchAdoptions = async () => {
@@ -47,9 +54,20 @@ export default function AdopcionesPage() {
             query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
         }
 
-        const { data, error } = await query.order("created_at", { ascending: false });
+        const start = page * PAGE_SIZE;
+        const end = start + PAGE_SIZE - 1;
+        const { data, error } = await query
+            .order("created_at", { ascending: false })
+            .range(start, end);
 
-        if (!error && data) setAdoptions(data as Adoption[]);
+        if (!error && data) {
+            if (page === 0) {
+                setAdoptions(data as Adoption[]);
+            } else {
+                setAdoptions((prev) => [...prev, ...(data as Adoption[])]);
+            }
+            setHasMore(data.length === PAGE_SIZE);
+        }
         setLoading(false);
     };
 
@@ -155,7 +173,7 @@ export default function AdopcionesPage() {
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                                     Estado
                                 </Label>
-                                <Select value={filterStatus} onValueChange={(value) => setFilterStatus(value)}>
+                                <Select value={filterStatus} onValueChange={(value) => { setFilterStatus(value); }}>
                                     <SelectTrigger id="filter-status" className="rounded-xl border-blue-300 focus:border-blue-500 bg-white shadow-sm px-4 py-2">
                                         <SelectValue placeholder="Todos" />
                                     </SelectTrigger>
@@ -172,7 +190,7 @@ export default function AdopcionesPage() {
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
                                     Especie
                                 </Label>
-                                <Select value={filterSpecies} onValueChange={(value) => setFilterSpecies(value)}>
+                                <Select value={filterSpecies} onValueChange={(value) => { setFilterSpecies(value); }}>
                                     <SelectTrigger id="filter-species" className="rounded-xl border-blue-300 focus:border-blue-500 bg-white shadow-sm px-4 py-2">
                                         <SelectValue placeholder="Todas" />
                                     </SelectTrigger>
@@ -190,6 +208,7 @@ export default function AdopcionesPage() {
                                 setFilterStatus("all");
                                 setFilterSpecies("all");
                                 setSearchTerm("");
+                                setPage(0);
                             }}
                             className="w-full md:w-auto mt-2 md:mt-0 rounded-xl px-4 py-2 shadow-md bg-blue-500 text-white font-semibold hover:bg-blue-600 hover:scale-105 transition-all duration-300"
                             variant={"default"}
@@ -200,16 +219,29 @@ export default function AdopcionesPage() {
                 </div>
             </Card>
 
-            {loading && <div>Cargando...</div>}
-            {!loading && adoptions.length === 0 && (
+            {loading && page === 0 ? (
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-8">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <PostSkeleton key={i} />
+                    ))}
+                </div>
+            ) : adoptions.length === 0 ? (
                 <div className="text-gray-500">No hay perritos en adopción por ahora.</div>
+            ) : (
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-2">
+                    {adoptions.map((adoption) => (
+                        <AdoptionCard key={adoption.id} adoption={adoption} />
+                    ))}
+                </div>
             )}
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-2">
-                {adoptions.map((adoption) => (
-                    <AdoptionCard key={adoption.id} adoption={adoption} />
-                ))}
-            </div>
+            {hasMore && (
+                <div className="flex justify-center mt-4 rounded-xl px-4 py-2 hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+                    <Button onClick={() => setPage((p) => p + 1)} disabled={loading}>
+                        {loading ? <Spinner /> : "Cargar más adopciones"}
+                    </Button>
+                </div>
+            )}
 
             <footer className="mt-12 bg-gray-100 py-4 text-center text-sm text-gray-600">
                 © 2025 Mascotas del Milagro – Mi Amigo Fiel 🐶🐱
