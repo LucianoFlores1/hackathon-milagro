@@ -8,22 +8,46 @@ import { Adoption } from "@/types/adoption";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 export default function AdopcionesPage() {
     const [adoptions, setAdoptions] = useState<Adoption[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [filterStatus, setFilterStatus] = useState<string>("all"); // available | adopted | all
+    const [filterSpecies, setFilterSpecies] = useState<string>("all"); // dog | cat | other | all
+    const [searchTerm, setSearchTerm] = useState<string>("");
 
     useEffect(() => {
         fetchAdoptions();
-    }, []);
+    }, [filterStatus, filterSpecies, searchTerm]);
 
     const fetchAdoptions = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from("adoptions")
-            .select("*")
-            .order("created_at", { ascending: false });
+        let query = supabase.from("adoptions").select("*");
+
+        if (filterStatus && filterStatus !== "all") {
+            query = query.eq("status", filterStatus);
+        }
+
+        if (filterSpecies && filterSpecies !== "all") {
+            query = query.eq("species", filterSpecies);
+        }
+
+        if (searchTerm) {
+            // búsqueda en nombre o descripción
+            query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+        }
+
+        const { data, error } = await query.order("created_at", { ascending: false });
 
         if (!error && data) setAdoptions(data as Adoption[]);
         setLoading(false);
@@ -106,6 +130,75 @@ export default function AdopcionesPage() {
 
 
             <h1 className="text-3xl font-bold text-center">Adopciones</h1>
+
+            {/* Tarjeta de búsqueda y filtros (coherente con Home) */}
+            <Card className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-blue-50 via-white to-blue-100 border border-blue-200">
+                <div className="space-y-6">
+                    <div className="flex flex-col md:flex-row md:items-end gap-6">
+                        <div className="space-y-2 flex-grow">
+                            <Label htmlFor="search" className="font-semibold text-blue-700 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" /></svg>
+                                Buscar por nombre o descripción
+                            </Label>
+                            <Input
+                                className="rounded-xl border-blue-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200 bg-white shadow-sm px-4 py-2"
+                                id="search"
+                                placeholder="Ej: Cachorro en Barrio Centro..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex gap-4 w-full">
+                            {/* Filtro por estado */}
+                            <div className="space-y-2 w-full md:w-44">
+                                <Label htmlFor="filter-status" className="font-semibold text-blue-700 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                    Estado
+                                </Label>
+                                <Select value={filterStatus} onValueChange={(value) => setFilterStatus(value)}>
+                                    <SelectTrigger id="filter-status" className="rounded-xl border-blue-300 focus:border-blue-500 bg-white shadow-sm px-4 py-2">
+                                        <SelectValue placeholder="Todos" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Todos</SelectItem>
+                                        <SelectItem value="available">Disponible</SelectItem>
+                                        <SelectItem value="adopted">Adoptado</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            {/* Filtro por especie */}
+                            <div className="space-y-2 w-full md:w-44">
+                                <Label htmlFor="filter-species" className="font-semibold text-blue-700 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                                    Especie
+                                </Label>
+                                <Select value={filterSpecies} onValueChange={(value) => setFilterSpecies(value)}>
+                                    <SelectTrigger id="filter-species" className="rounded-xl border-blue-300 focus:border-blue-500 bg-white shadow-sm px-4 py-2">
+                                        <SelectValue placeholder="Todas" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Todas</SelectItem>
+                                        <SelectItem value="dog">Perro</SelectItem>
+                                        <SelectItem value="cat">Gato</SelectItem>
+                                        <SelectItem value="other">Otro</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <Button
+                            onClick={() => {
+                                setFilterStatus("all");
+                                setFilterSpecies("all");
+                                setSearchTerm("");
+                            }}
+                            className="w-full md:w-auto mt-2 md:mt-0 rounded-xl px-4 py-2 shadow-md bg-blue-500 text-white font-semibold hover:bg-blue-600 hover:scale-105 transition-all duration-300"
+                            variant={"default"}
+                        >
+                            Limpiar filtros
+                        </Button>
+                    </div>
+                </div>
+            </Card>
 
             {loading && <div>Cargando...</div>}
             {!loading && adoptions.length === 0 && (
