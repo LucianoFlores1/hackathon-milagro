@@ -68,27 +68,38 @@ export default function AdoptionForm({ onSuccess }: { onSuccess?: () => void }) 
             setUploading(false);
         }
 
-        // Generar edit_token simple (puedes mejorar esto)
-        const edit_token = Math.random().toString(36).slice(2);
+        // Generar token único de edición
+        const edit_token = (typeof crypto !== "undefined" && 'randomUUID' in crypto)
+            ? (crypto as any).randomUUID()
+            : Math.random().toString(36).slice(2);
 
-        const { error: insertError } = await supabase.from("adoptions").insert([
-            {
-                species,
-                name: title,
-                description,
-                zone_text: zone,
-                contact_type: contactType,
-                contact_value: contactValue,
-                image_url: finalImageUrl,
-                edit_token,
-            },
-        ]);
+        const { data: insertData, error: insertError } = await supabase
+            .from("adoptions")
+            .insert([
+                {
+                    species,
+                    name: title,
+                    description,
+                    status: "available",
+                    zone_text: zone,
+                    contact_type: contactType,
+                    contact_value: contactValue,
+                    image_url: finalImageUrl,
+                    edit_token,
+                },
+            ])
+            .select();
 
         setLoading(false);
 
         if (insertError) {
             setError("Error al publicar la adopción.");
         } else {
+            // Guardar token en localStorage para futuras ediciones
+            const newId = insertData?.[0]?.id as string | undefined;
+            if (newId && typeof window !== 'undefined') {
+                localStorage.setItem(`adoption_edit_token_${newId}`, edit_token);
+            }
             setSuccess(true);
             setTitle("");
             setDescription("");

@@ -41,6 +41,8 @@ export default function AdoptionDetail() {
   const [captchaChecked, setCaptchaChecked] = useState(false)
   const [reporting, setReporting] = useState(false)
   const REPORT_THRESHOLD = 3
+  const [markingAdopted, setMarkingAdopted] = useState(false)
+  const [toastMsg, setToastMsg] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchAdoption = async () => {
@@ -62,6 +64,11 @@ export default function AdoptionDetail() {
 
   return (
     <div className="p-6 space-y-6 max-w-2xl mx-auto relative">
+      {toastMsg && (
+        <div className="mb-4 p-4 rounded-lg bg-green-100 text-green-700 text-center font-semibold">
+          {toastMsg}
+        </div>
+      )}
       {navigating && (
         <div className="fixed inset-0 min-h-screen z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
           <div className="flex flex-col items-center">
@@ -163,6 +170,46 @@ export default function AdoptionDetail() {
                 disabled={reporting}
               >
                 Reportar
+              </Button>
+            </div>
+          )}
+
+          {/* Botón marcar como adoptado (requiere token en localStorage) */}
+          {adoption.status !== "adopted" && (
+            <div className="pt-4">
+              <Button
+                onClick={async () => {
+                  if (!adoption) return
+                  const token = typeof window !== 'undefined' ? localStorage.getItem(`adoption_edit_token_${adoption.id}`) : null
+                  if (!token || token !== adoption.edit_token) {
+                    setToastMsg("No tienes permisos para marcar como adoptado en este dispositivo.")
+                    setTimeout(() => setToastMsg(null), 3000)
+                    return
+                  }
+                  setMarkingAdopted(true)
+                  const { error } = await supabase
+                    .from("adoptions")
+                    .update({ status: "adopted", contact_value: "" })
+                    .eq("id", adoption.id)
+                    .eq("edit_token", token)
+                  if (error) {
+                    setToastMsg("No se pudo marcar como adoptado.")
+                  } else {
+                    setToastMsg("¡Marcado como adoptado!")
+                    const { data } = await supabase
+                      .from("adoptions")
+                      .select("*")
+                      .eq("id", adoption.id)
+                      .single()
+                    setAdoption(data as Adoption)
+                  }
+                  setMarkingAdopted(false)
+                  setTimeout(() => setToastMsg(null), 3000)
+                }}
+                disabled={markingAdopted}
+                className="bg-green-600 text-white hover:bg-green-700 rounded-xl px-4 py-2 shadow-md"
+              >
+                {markingAdopted ? "Marcando..." : "Marcar como adoptado"}
               </Button>
             </div>
           )}
