@@ -230,7 +230,7 @@ export default function AdopcionesPage() {
             ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-2">
                     {adoptions.map((adoption) => (
-                        <AdoptionCard key={adoption.id} adoption={adoption} />
+                        <AdoptionCard key={adoption.id} adoption={adoption} href={`/adopciones/${adoption.id}`} />
                     ))}
                 </div>
             )}
