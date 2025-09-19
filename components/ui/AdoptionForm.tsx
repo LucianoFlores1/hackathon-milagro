@@ -104,7 +104,7 @@ export default function AdoptionForm({ onSuccess }: { onSuccess?: () => void }) 
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-lg mx-auto bg-white p-6 rounded-xl shadow">
+        <form onSubmit={handleSubmit} className="bg-gray-100 space-y-4 w-full p-6 rounded-xl shadow">
             <h2 className="text-xl font-bold mb-2">Publicar perrito en adopción</h2>
 
             <div>
