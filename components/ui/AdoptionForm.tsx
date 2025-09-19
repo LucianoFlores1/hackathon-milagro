@@ -184,7 +184,6 @@ export default function AdoptionForm({ onSuccess }: { onSuccess?: () => void }) 
             </div>
 
             <div>
-                <Label>Imagen (URL)</Label>
                 <Input value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="Pega el link de la imagen o súbela" />
             </div>
 
