@@ -68,9 +68,9 @@ export default function AdoptionForm({ onSuccess }: { onSuccess?: () => void }) 
             setUploading(false);
         }
 
-        // Generar token único de edición
-        const edit_token = (typeof crypto !== "undefined" && 'randomUUID' in crypto)
-            ? (crypto as any).randomUUID()
+        // Generar token único de edición sin usar `any`
+        const edit_token = typeof window !== "undefined" && typeof window.crypto?.randomUUID === "function"
+            ? window.crypto.randomUUID()
             : Math.random().toString(36).slice(2);
 
         const { data: insertData, error: insertError } = await supabase
