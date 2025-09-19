@@ -37,6 +37,10 @@ export default function AdoptionDetail() {
   const router = useRouter()
   const [adoption, setAdoption] = useState<Adoption | null>(null)
   const [navigating, setNavigating] = useState(false)
+  const [showCaptcha, setShowCaptcha] = useState(false)
+  const [captchaChecked, setCaptchaChecked] = useState(false)
+  const [reporting, setReporting] = useState(false)
+  const REPORT_THRESHOLD = 3
 
   useEffect(() => {
     const fetchAdoption = async () => {
@@ -148,8 +152,69 @@ export default function AdoptionDetail() {
               </div>
             </div>
           )}
+
+          {/* Botón Reportar */}
+          {adoption.status !== "adopted" && !adoption.contact_hidden && (
+            <div className="pt-4">
+              <Button
+                variant="outline"
+                className="bg-red-100 text-red-700 hover:bg-red-200 rounded-xl px-4 py-2 shadow-md"
+                onClick={() => setShowCaptcha(true)}
+                disabled={reporting}
+              >
+                Reportar
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Mini captcha y lógica de reporte */}
+      {showCaptcha && adoption && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl px-8 py-6 flex flex-col items-center gap-4 min-w-[320px] max-w-[90vw]">
+            <label className="flex items-center gap-2 text-lg font-medium">
+              <input type="checkbox" checked={captchaChecked} onChange={e => setCaptchaChecked(e.target.checked)} />
+              No soy un robot
+            </label>
+            <div className="flex gap-2 w-full justify-center">
+              <Button
+                onClick={async () => {
+                  if (!adoption) return
+                  setReporting(true)
+                  const newCount = (adoption.reports_count || 0) + 1
+                  const { error } = await supabase
+                    .from("adoptions")
+                    .update({
+                      reports_count: newCount,
+                      contact_hidden: newCount >= REPORT_THRESHOLD,
+                    })
+                    .eq("id", adoption.id)
+                  if (!error) {
+                    // refrescar
+                    const { data } = await supabase
+                      .from("adoptions")
+                      .select("*")
+                      .eq("id", adoption.id)
+                      .single()
+                    setAdoption(data as Adoption)
+                    setShowCaptcha(false)
+                    setCaptchaChecked(false)
+                  }
+                  setReporting(false)
+                }}
+                disabled={!captchaChecked || reporting}
+                className="bg-red-600 text-white hover:bg-red-700 rounded-xl px-4 py-2 shadow-md"
+              >
+                Enviar reporte
+              </Button>
+              <Button variant="ghost" onClick={() => { setShowCaptcha(false); setCaptchaChecked(false); }}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

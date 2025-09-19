@@ -10,4 +10,5 @@ export type Adoption = {
     contact_type?: string;
     contact_value?: string;
     contact_hidden?: boolean;
+    reports_count?: number;
 };
