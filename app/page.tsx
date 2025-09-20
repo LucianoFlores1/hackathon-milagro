@@ -359,27 +359,7 @@ export default function Home() {
           </div>
         </div>
       )}
-      <header className="sticky top-0 z-50 bg-white shadow-md">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-blue-600">🐾 Mi Amigo Fiel</h1>
-          <nav className="space-x-4">
-            <Link href="/" className="text-blue-600 font-semibold">Inicio</Link>
-            <Link href="/adopciones" className="text-gray-700 hover:text-blue-600">Adopciones</Link>
-            <Link href="/adopciones" className="text-gray-700 hover:text-blue-600 hidden">Perdidos</Link>
-            <button onClick={() => {
-              setShowForm(true);
-              setTimeout(() => {
-                const el = document.getElementById("create-post");
-                if (el) {
-                  el.scrollIntoView({ behavior: "smooth" });
-                }
-              }, 50);
-            }} className="bg-blue-600 text-white w-full md:w-auto mt-2 md:mt-0 rounded-xl px-2 py-2 shadow-md 
-            hover:shadow-lg hover:scale-[1.02] 
-            transition-all duration-300">Publicar</button>
-          </nav>
-        </div>
-      </header>
+      {/* Header global en layout */}
       {/* Disclaimer de seguridad */}
       <div className="w-full max-w-4xl mx-auto mt-2 mb-4">
         <div className="flex items-center gap-2 bg-yellow-100 border border-yellow-300 text-yellow-900 rounded-lg px-4 py-2 text-sm font-medium shadow">

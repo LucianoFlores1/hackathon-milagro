@@ -73,30 +73,7 @@ export default function AdopcionesPage() {
 
     return (
         <div className="p-6 space-y-6 max-w-4xl mx-auto">
-            {/* Nav coherente con Home */}
-            <header className="sticky top-0 z-50 bg-white shadow-md">
-                <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-blue-600">🐾 Mi Amigo Fiel</h1>
-                    <nav className="space-x-4">
-                        <Link href="/" className="text-gray-700 hover:text-blue-600">
-                            Inicio
-                        </Link>
-                        <button
-                            onClick={() => {
-                                setShowForm(true);
-                                setTimeout(() => {
-                                    const el = document.getElementById("create-adoption");
-                                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                                }, 50);
-                            }}
-                            className="bg-blue-600 text-white w-full md:w-auto mt-2 md:mt-0 rounded-xl px-2 py-2 shadow-md 
-                         hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
-                        >
-                            Publicar adopción
-                        </button>
-                    </nav>
-                </div>
-            </header>
+            {/* Header global en layout */}
 
             {/* Disclaimer de seguridad (coherente) */}
             <div className="w-full max-w-4xl mx-auto mt-2 mb-4">
