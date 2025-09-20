@@ -19,9 +19,11 @@ import { Dog, Cat, PawPrint, MapPin, Calendar, MessageCircle, Mail, Loader2 } fr
 import Link from "next/link"
 import { Spinner } from "@/components/ui/Spinner"
 import PostCard from "@/components/ui/PostCard"
+import AdoptionCard from "@/components/ui/AdoptionCard"
 import Alert from "@/components/ui/Alert"
 import { PostSkeleton } from "@/components/ui/PostSkeleton"
 import { useRouter } from "next/navigation";
+import type { Adoption } from "@/types/adoption";
 import { span } from "framer-motion/client"
 
 type Post = {
@@ -38,7 +40,11 @@ type Post = {
   image_url: string | null
 }
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 12;
+
+type FeedItem =
+  | { kind: "post"; created_at: string; post: Post }
+  | { kind: "adoption"; created_at: string; adoption: Adoption };
 
 const formatRelativeDate = (dateString: string): string => {
   const date = new Date(dateString);
@@ -111,7 +117,7 @@ export default function Home() {
   const [eventDate, setEventDate] = useState("")
   const [contactType, setContactType] = useState("whatsapp")
   const [contactValue, setContactValue] = useState("")
-  const [posts, setPosts] = useState<Post[]>([])
+  const [feed, setFeed] = useState<FeedItem[]>([])
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [filterStatus, setFilterStatus] = useState<string>("all")
@@ -126,56 +132,72 @@ export default function Home() {
   const router = useRouter();
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
 
-  // posts filtrados en memoria
-  const filteredPosts = posts.filter((post) => {
-    const matchStatus =
-      filterStatus === "all" ? true : post.status === filterStatus
-    const matchSpecies =
-      filterSpecies === "all" ? true : post.species === filterSpecies
-    return matchStatus && matchSpecies
-  })
+  // Nota: el feed se filtra desde la base por tipo
 
+  // Trae y combina publicaciones y adopciones
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchCombined = async () => {
       setLoading(true);
 
-      let query = supabase.from("posts").select("*")
+      const perTable = Math.ceil(PAGE_SIZE / 2);
+      const start = page * perTable;
+      const end = start + perTable - 1;
 
-      // Aplica el filtro de estado si está activo
+      // Posts perdidos/encontrados
+      let postsQuery = supabase.from("posts").select("*");
       if (filterStatus && filterStatus !== "all") {
-        query = query.eq("status", filterStatus)
+        postsQuery = postsQuery.eq("status", filterStatus);
       }
-
-      // Aplica el filtro de especie si está activo
       if (filterSpecies && filterSpecies !== "all") {
-        query = query.eq("species", filterSpecies)
+        postsQuery = postsQuery.eq("species", filterSpecies);
       }
-
-      // 🔍 Agrega el filtro de búsqueda de texto
       if (searchTerm) {
-        query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+        postsQuery = postsQuery.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
       }
-
-      const start = page * PAGE_SIZE;
-      const end = start + PAGE_SIZE - 1;
-
-      const { data, error } = await query
+      const { data: postsData, error: postsErr } = await postsQuery
         .order("created_at", { ascending: false })
         .range(start, end);
 
-      if (!error && data) {
-        if (page === 0) {
-          setPosts(data as Post[])
-        } else {
-          setPosts((prevPosts) => [...prevPosts, ...(data as Post[])])
+      // Adopciones: solo se incluyen si el filtro de estado es "all"
+      let adoptionsData: Adoption[] = [];
+      let adoptionsCount = 0;
+      if (filterStatus === "all") {
+        let adoptionsQuery = supabase.from("adoptions").select("*");
+        if (filterSpecies && filterSpecies !== "all") {
+          adoptionsQuery = adoptionsQuery.eq("species", filterSpecies);
         }
-        setHasMore(data.length === PAGE_SIZE);
+        if (searchTerm) {
+          adoptionsQuery = adoptionsQuery.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+        }
+        const { data: adData, error: adErr } = await adoptionsQuery
+          .order("created_at", { ascending: false })
+          .range(start, end);
+        if (!adErr && adData) {
+          adoptionsData = adData as Adoption[];
+          adoptionsCount = adoptionsData.length;
+        }
       }
 
+      const postsArr = (!postsErr && postsData ? (postsData as Post[]) : [])
+        .map<FeedItem>((p) => ({ kind: "post", created_at: p.created_at, post: p }));
+      const adoptionsArr = (adoptionsData || [])
+        .map<FeedItem>((a) => ({ kind: "adoption", created_at: a.created_at, adoption: a }));
+
+      const merged = [...postsArr, ...adoptionsArr].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      const pageSlice = merged.slice(0, PAGE_SIZE);
+
+      if (page === 0) {
+        setFeed(pageSlice);
+      } else {
+        setFeed((prev) => [...prev, ...pageSlice]);
+      }
+
+      const postsCount = postsArr.length;
+      setHasMore(postsCount === perTable || adoptionsCount === perTable);
       setLoading(false);
-    }
-    fetchPosts()
-  }, [filterStatus, filterSpecies, searchTerm, page])
+    };
+    fetchCombined();
+  }, [filterStatus, filterSpecies, searchTerm, page]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -257,19 +279,8 @@ export default function Home() {
       setImageFile(null);
       setPage(0);
 
-      // Refresca los posts inmediatamente
-      setLoading(true);
-      const query = supabase.from("posts").select("*");
-      const start = 0;
-      const end = PAGE_SIZE - 1;
-      const { data, error: fetchError } = await query
-        .order("created_at", { ascending: false })
-        .range(start, end);
-      if (!fetchError && data) {
-        setPosts(data as Post[]);
-        setHasMore(data.length === PAGE_SIZE);
-      }
-      setLoading(false);
+      // Refrescar feed unificado inmediatamente
+      setPage(0);
     }
     setLoading(false);
   }
@@ -352,7 +363,9 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-bold text-blue-600">🐾 Mi Amigo Fiel</h1>
           <nav className="space-x-4">
-            <Link href="/" className="text-gray-700 hover:text-blue-600">Inicio</Link>
+            <Link href="/" className="text-blue-600 font-semibold">Inicio</Link>
+            <Link href="/adopciones" className="text-gray-700 hover:text-blue-600">Adopciones</Link>
+            <Link href="/adopciones" className="text-gray-700 hover:text-blue-600 hidden">Perdidos</Link>
             <button onClick={() => {
               setShowForm(true);
               setTimeout(() => {
@@ -624,12 +637,23 @@ export default function Home() {
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-8">
-          {posts.map((post) => (
-            <div key={post.id} onClick={() => {
-              setNavigating(true);
-              router.push(`/posts/${post.id}`);
-            }}>
-              <PostCard post={post} />
+          {feed.map((item, idx) => (
+            <div
+              key={`${item.kind}-${idx}-${item.kind === "post" ? item.post.id : item.adoption.id}`}
+              onClick={() => {
+                setNavigating(true);
+                if (item.kind === "post") {
+                  router.push(`/posts/${item.post.id}`);
+                } else {
+                  router.push(`/adopciones/${item.adoption.id}`);
+                }
+              }}
+            >
+              {item.kind === "post" ? (
+                <PostCard post={item.post} />
+              ) : (
+                <AdoptionCard adoption={item.adoption} />
+              )}
             </div>
           ))}
         </div>

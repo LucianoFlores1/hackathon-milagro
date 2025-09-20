@@ -30,8 +30,9 @@ const AdoptionCard = ({ adoption, href }: AdoptionCardProps) => {
         <Card className="transform transition-all duration-500 ease-out hover:scale-105 hover:shadow-xl animate-fadeIn relative overflow-hidden">
             {/* Cinta si está adoptado */}
             {adoption.status === "adopted" && (
-                <div className="absolute top-8 left-[-60px] rotate-[-20deg] w-[300px] bg-green-600 text-white text-center py-2 font-bold shadow-lg z-20">
-                    ¡Este perrito fue adoptado!
+                <div
+                    className="absolute top-8 left-[-30px] rotate-[-29deg] w-[300px] -translate-x-[40px] bg-green-600 text-white text-center py-2 font-bold shadow-lg z-20">
+                    ¡Mascota adoptada!
                 </div>
             )}
             <div>
