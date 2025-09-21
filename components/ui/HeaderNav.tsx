@@ -12,7 +12,7 @@ export default function HeaderNav() {
     const links = useMemo(() => (
         [
             { href: "/", label: "Inicio" },
-            { href: "/perdidos", label: "Perdidos" },
+            { href: "/perdidos", label: "Extraviados" },
             { href: "/adopciones", label: "Adopciones" },
         ]
     ), []);
