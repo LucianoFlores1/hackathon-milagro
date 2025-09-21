@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
+import HeaderNav from "@/components/ui/HeaderNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,16 +47,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header className="sticky top-0 z-50 bg-white shadow-md">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <h1 className="text-xl font-bold text-blue-600">🐾 Mi Amigo Fiel</h1>
-            <nav className="space-x-4">
-              <Link href="/" className="text-gray-700 hover:text-blue-600">Inicio</Link>
-              <Link href="/perdidos" className="text-gray-700 hover:text-blue-600">Perdidos</Link>
-              <Link href="/adopciones" className="text-gray-700 hover:text-blue-600">Adopciones</Link>
-            </nav>
-          </div>
-        </header>
+        <HeaderNav />
         {children}
       </body>
     </html>
